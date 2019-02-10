@@ -12,8 +12,12 @@ Minor is 31% against 40% in Top 50 Nederland.
 My mean tempo is 120 BPM (sd= 31.7) against 116 BPM (sd= 24,0) 
 For loudness the outcome for my most listened 2018 has a mean of -8,06 ; sd= 3,55. For Top50NL it has a mean of -6,64  with sd= 2,84.
 
-I can make a formule to calculate the sadness (because of the different in numbers this formulate is not really accurate, but it is a sketch for futher steps). Sadness= 3mode -2(tempo/1000) -loudness/10. 
+I can make a formule to calculate the sadness (because of the different in numbers this formulate is not really accurate, but it is a sketch for futher steps).
+
+Sadness= 3mode -2(tempo/1000) -loudness/10. 
+
 Sadness(Top50NL)= 3x0,40 - 2x0,116 + 0,664 = 1.632
+
 Sadness(My2018)= 3x0,31 - 2x0,120 + 0,806 = 1.976
 
 Imported to keep in mind for the next weeks is that aspects as tempo and loudness are not well measured for songs with long silent intros, like You- The 1975. Those kind of songs are better left behind. While googling for these statistics I found out that Spotify has a correctness change, this is something to use in the next weeks. 
