@@ -1,6 +1,7 @@
-# Computational Musicology
 
-## Portfolio by Mariëlle Baelemans
+
+# Portfolio by Mariëlle Baelemans
+## Week 6: Music Information Retrieval * Spotify API 
 
 
 
