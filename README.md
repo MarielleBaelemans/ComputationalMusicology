@@ -23,7 +23,7 @@ Sadness(My2018)= 3x0,31 - 2x0,120 + 0,806 = 1.976
 
 My goal is to create a formule that which takes these aspects in a 3:2:1 ratio and is based on a 1 to 100 scale. 
 
-Imported to keep in mind for the next weeks is that aspects as tempo and loudness are not well measured for songs with long silent intros, like You- The 1975. Those kind of songs are better left behind. While googling for these statistics I found out that Spotify has a correctness change, this is something to use in the next weeks. 
+Imported to keep in mind for the next weeks is that aspects as tempo and loudness are not well measured for songs with long silent intros, like You- The 1975. Those kind of songs are better left behind. While googling for these statistics I found out that Spotify has a correctness chance, this is something to use in the next weeks. 
 
 I would also prefer to use Last.fm for my statistics, because I spend a big amount of my music listening on YouTube. 
 
