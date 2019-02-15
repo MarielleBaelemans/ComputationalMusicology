@@ -29,13 +29,22 @@ I would also prefer to use Last.fm for my statistics, because I spend a big amou
 
 ## Week 7 Data Visualisation
 First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with the 'Top2000' of the Netherlands (of 2018, I made my own playlist also in 2018). Good to notice is that my own playlist (called 'mijn') is 3x as big as the Top2000. 
-As dr. Burgoyne told in the lecture, for this research I will use: mode, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. 
+As dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. 
 
 
  ### Here are the visualisations.
- ![PlaylistVxE](PlaylistVxE.png)
+I started off with making a easy histogram. 
+![ModeHistogram](modehistogram.jpeg)
+
+Because the playlists differ in amount of songs, it is way better to visualise this with percentages. 
+
+![PlaylistVxE](PlaylistVxE.png)
+ 
+ Because I was not completely happy with the way the major/minor differences was visualised, I changed the pallette to 'Set1', which gave me a red/blue distinction. It kinda looks like an abstract painting now! 
   ![PlaylistVxE](PlaylistVxER.png)
- ![ModeHistogram](modehistogram.jpeg)
+  
+  What this graph still misses is the 'tempo' factor. 
+
  
  ### Some codings I need to remember for myself
 .# Load libraries (every time)
