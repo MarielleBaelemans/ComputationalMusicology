@@ -27,10 +27,15 @@ Imported to keep in mind for the next weeks is that aspects as tempo and loudnes
 
 I would also prefer to use Last.fm for my statistics, because I spend a big amount of my music listening on YouTube. 
 
-# Week 7 Data Visualisation
-First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with the 'Top2000' of the Netherlands (of 2018, I made my own playlist also in 2018)
+## Week 7 Data Visualisation
+First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with the 'Top2000' of the Netherlands (of 2018, I made my own playlist also in 2018). Good to notice is that my own playlist (called 'mijn') is 3x as big as the Top2000. 
+As dr. Burgoyne told in the lecture, for this research I will use: mode, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. 
 
-## Some codings I need to remember for myself
+
+ ### Here are the visualisations.
+ ![PlaylistVxE](PlaylistVxE.png) 
+ 
+ ### Some codings I need to remember for myself
 Mood %>%                       # Start with awards.
   ggplot(                      # Set up the plot.
     aes(
@@ -67,5 +72,3 @@ Mood %>%                       # Start with awards.
     y = "Energy",
     colour = "Mode"
   )
- ## Here are the visualisations.
- 
