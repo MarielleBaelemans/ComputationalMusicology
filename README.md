@@ -42,6 +42,7 @@ Because the playlists differ in amount of songs, it is way better to visualise t
  
  Because I was not completely happy with the way the major/minor differences was visualised, I changed the pallette to 'Set1', which gave me a red/blue distinction. It kinda looks like an abstract painting now! 
   ![PlaylistVxE](PlaylistVxER.png)
+  While the Top2000 makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
   
   What this graph still misses is the 'tempo' factor. 
 
