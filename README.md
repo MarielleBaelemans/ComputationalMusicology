@@ -33,8 +33,8 @@ As dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, 
 
 
  ### Here are the visualisations.
-I started off with making a easy histogram. 
-![ModeHistogram](modehistogram.jpeg)
+I started off with making a easy bargraph to compare the major/minor difference per playlist: 
+![BarGraphColor](BarGraphColor.png)
 
 Because the playlists differ in amount of songs, it is way better to visualise this with percentages. 
 
