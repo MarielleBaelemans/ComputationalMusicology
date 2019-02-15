@@ -37,6 +37,42 @@ As dr. Burgoyne told in the lecture, for this research I will use: mode, energy 
  ![ModeHistogram](modehistogram.jpeg)
  
  ### Some codings I need to remember for myself
+.# Load libraries (every time)
+
+library(tidyverse)
+library(spotifyr)
+
+.# Set Spotify access variables (every time)
+
+Sys.setenv(SPOTIFY_CLIENT_ID = 'e944328ebc754d5dae4607ba0b9b7aa0')
+Sys.setenv(SPOTIFY_CLIENT_SECRET = '32c46cc6766a44dfb68e24f7a1aae5b6')
+
+.# Download Grammy and Edison award playlists (pop) for 2019
+
+Top2000 <- get_playlist_audio_features('radio2nl', '1DTzz7Nh2rJBnyFbjsH1Mh')
+Mijn<- get_playlist_audio_features('11122548577','76MRLl4f6AvyYCrvs7X11P')
+
+.# Combine data sets with a labelling variable
+
+Mood <-
+  Top2000 %>% mutate(playlist = "Top2000") %>%
+  bind_rows(Mijn %>% mutate(playlist = "Mijn"))
+
+.# Start with histogram or bar for showing one variable.
+
+Mijn %>% ggplot(aes(x = mode)) + geom_histogram(sat= 'count')
+ggplot(Mood, aes(x=mode), col=playlist) + geom_histogram(stat='count')+
+  facet_wrap(~ playlist)
+
+
+.# Code by Ashley -> my research
+award_labels <-
+  tibble(
+    label = c("By the Bright of Night", "Immaterial"),
+    playlist = c("Edisons", "Grammys"),
+    valence = c(0.151, 0.828),
+    energy = c(0.119, 0.717),
+  )
 Mood %>%                       # Start with awards.
   ggplot(                      # Set up the plot.
     aes(
@@ -73,3 +109,8 @@ Mood %>%                       # Start with awards.
     y = "Energy",
     colour = "Mode"
   )
+           
+           
+           
+        
+           
