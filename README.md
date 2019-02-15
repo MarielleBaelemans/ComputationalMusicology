@@ -33,7 +33,8 @@ As dr. Burgoyne told in the lecture, for this research I will use: mode, energy 
 
 
  ### Here are the visualisations.
- ![PlaylistVxE](PlaylistVxE.png) 
+ ![PlaylistVxE](PlaylistVxE.png)
+ ![ModeHistogram](modehistogram.jpeg)
  
  ### Some codings I need to remember for myself
 Mood %>%                       # Start with awards.
