@@ -75,8 +75,7 @@ ggplot(Mood, aes(x=mode), col=playlist) + geom_histogram(stat='count')+
   facet_wrap(~ playlist)
 
 
-.# Code by Ashley -> my research
-
+.# Code by dr. Burgoyne -> my research
 
 award_labels <-
   tibble(
