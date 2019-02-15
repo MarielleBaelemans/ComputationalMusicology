@@ -66,6 +66,8 @@ ggplot(Mood, aes(x=mode), col=playlist) + geom_histogram(stat='count')+
 
 
 .# Code by Ashley -> my research
+
+
 award_labels <-
   tibble(
     label = c("By the Bright of Night", "Immaterial"),
@@ -73,6 +75,8 @@ award_labels <-
     valence = c(0.151, 0.828),
     energy = c(0.119, 0.717),
   )
+  
+  
 Mood %>%                       # Start with awards.
   ggplot(                      # Set up the plot.
     aes(
@@ -81,6 +85,8 @@ Mood %>%                       # Start with awards.
       size = loudness,
       colour = mode
     )
+    
+    
   ) +
   geom_point() +               # Scatter plot.
   geom_rug(size = 0.1) +       # Add 'fringes' to show data distribution.
@@ -89,19 +95,27 @@ Mood %>%                       # Start with awards.
     limits = c(0, 1),
     breaks = c(0, 0.50, 1),  # Use grid-lines for quadrants only.
     minor_breaks = NULL      # Remove 'minor' grid-lines.
+    
+    
   ) +
   scale_y_continuous(          # Fine-tune the y axis in the same way.
     limits = c(0, 1),
     breaks = c(0, 0.50, 1),
     minor_breaks = NULL
+    
+    
   ) +
   scale_colour_brewer(         # Use the Color Brewer to choose a palette.
     type = "qual",           # Qualitative set.
     palette = "Paired"       # Name of the palette is 'Paired'.
+    
+    
   ) +
   scale_size_continuous(       # Fine-tune the sizes of each point.
     trans = "exp",           # Use an exp transformation to emphasise loud.
     guide = "none"           # Remove the legend for size.
+    
+    
   ) +
   theme_light() +              # Use a simpler them.
   labs(                        # Make the titles nice.
