@@ -38,7 +38,7 @@ I started off with making a easy bargraph to compare the major/minor difference 
 
 Because the playlists differ in amount of songs, it is way better to visualise this with percentages. 
 
-![PlaylistVxE](PlaylistVxE.png)
+![PlaylistVxE](PlaylistVxE.png) 
  
  Because I was not completely happy with the way the major/minor differences was visualised, I changed the pallette to 'Set1', which gave me a red/blue distinction. It kinda looks like an abstract painting now! 
   ![PlaylistVxE](PlaylistVxER.png)
