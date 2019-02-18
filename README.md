@@ -28,15 +28,20 @@ Imported to keep in mind for the next weeks is that aspects as tempo and loudnes
 I would also prefer to use Last.fm for my statistics, because I spend a big amount of my music listening on YouTube. 
 
 ## Week 7 Data Visualisation
+
 First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with the 'Top2000' of the Netherlands (of 2018, I made my own playlist also in 2018). Good to notice is that my own playlist (called 'mijn') is 3x as big as the Top2000. 
 As dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. 
 
 
  ### Here are the visualisations.
+ 
+ 
 I started off with making a easy bargraph to compare the major/minor difference per playlist: 
 ![BarGraphColor](BarGraphColor.png)
 
 Because the playlists differ in amount of songs, it is way better to visualise this with percentages. 
+
+
 The example visualisation dr. Burgoyne made for our lecture was luckily for me fitting for my portfolio. He told us that Energy and Valence are mostly used in music cognition for measuring emotion is music. This made me change my way of doing it in the research, so for now on I'll use energy, valence, mode and tempo as variables. 
 ![PlaylistVxE](PlaylistVxE.png) 
  
@@ -45,10 +50,12 @@ The example visualisation dr. Burgoyne made for our lecture was luckily for me f
   
   While the Top2000 makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
   
-  What this graph still misses is the 'tempo' factor. 
+  What this graph still misses is the 'tempo' factor. I don't know how I can add this variable without making my visualisation less cler. 
 
  
  ### Some codings I need to remember for myself
+
+
 .# Load libraries (every time)
 
 library(tidyverse)
