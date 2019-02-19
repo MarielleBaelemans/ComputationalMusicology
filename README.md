@@ -51,6 +51,8 @@ As dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, 
   
   While the Top2000 makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
   
+ In the graphics it is clear to see that my own playlist is alot bigger than the Top2000. For now it is not that big of deal, because the clusters are visible. 
+  
   What this graph still misses is the 'tempo' factor. I don't know how I can add this variable without making my visualisation less clear. 
 
  
