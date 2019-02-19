@@ -1,7 +1,7 @@
 
 
 # Portfolio by Mariëlle Baelemans
-## Week 6: Music Information Retrieval * Spotify API 
+## Week 6: Spotify API 
 
 
 
@@ -29,7 +29,7 @@ I would also prefer to use Last.fm for my statistics, because I spend a big amou
 
 ## Week 7 Data Visualisation
 
-First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with the 'Top2000' of the Netherlands (of 2018, I made my own playlist also in 2018). Good to notice is that my own playlist (called 'mijn') is 3x as big as the Top2000. 
+First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with the 'Top2000' of the Netherlands (of 2018, I made my own playlist also in 2018). Good to notice is that my own playlist (called 'mijn') is 3x as big as the Top2000. It is hard to decide what kind of playlist is best fitting for my project. Because I'm comparing my own music to 'normal' music, I should have a playlist that consist of songs that are most listened. So far I can't find a playlist like that. The Top2000 of the Netherlands is best fitting in a way that it is first of all relative big. Secondly it shows songs that are most known by the Dutch population, which I'm a part of. 
 As dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. 
 
 
