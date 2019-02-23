@@ -1,11 +1,12 @@
 ---
-  title: "Week 8 — Storyboards"
+title: "Sad Music"
 author: "Marielle Baelemans"
 date: "20 February 2019"
 output: 
   flexdashboard::flex_dashboard:
   storyboard: true
-theme: paper
+theme: lumen
+orientation: columns
 ---
   
 ```{r}
@@ -18,19 +19,26 @@ Sys.setenv(SPOTIFY_CLIENT_SECRET = '32c46cc6766a44dfb68e24f7a1aae5b6')
 
 ```
 
-### Sad Music?!
+Sad Music?!
+==========================================
 
-This is introductory text. In general, it is not possible to use headers in this text.
+Spotify API- Week 7
+-------------------------------------------
 
-***
-  
-  This is a second column of introductory text.
-![sadmusicmeme.jpg](sadmusicmeme.jpg)
-Week 6: Spotify API
-For my portfolio project I want to use the findings out of an earlier Musicology project. In my research on what makes music 'sad' I found that the minor aspect is the thing what makes music sad. Besides that aspect, also slowness and low pitch are important for giving a listener a sad feeling. My big goal for this portfolio project is to make a widget that measures how sad someone's playlist is by comparing these factors in a 3:2:1 ratio. With these outcomes I want to make a day by day scheme for how 'sad' your day was according to the songs you listened that day. A calendar that shows your mood based on the music you listen ;). For now this is a too big goal, so my first step is to compare the major/minor- ratio and the mean tempo of my own playlist 'Most listened 2018' to 'Top 50 Nederland' playlist. I have not found a way yet to measure the pitch of the songs in the playlists, so for now I use the 'loudness' as extra indicator.
 
+###Introduction 
+
+For this project I want to use the findings out of an earlier Musicology project. In my research on what makes music 'sad' I found that the minor aspect is the thing what makes music sad. Besides that aspect, also slowness and low pitch are important for giving a listener a sad feeling. My big goal for this portfolio project is to make a widget that measures how sad someone's playlist is by comparing these factors in a 3:2:1 ratio. With these outcomes I want to make a day by day scheme for how 'sad' your day was according to the songs you listened that day. A calendar that shows your mood based on the music you listen ;). For now this is a too big goal, for this project my research question is 'What is the mood of my own music, compared to most listenend pophits?
+So my first step is to compare the major/minor- ratio and the mean tempo of my own playlist 'Most listened 2018' to 'Top 50 Nederland' playlist. I have not found a way yet to measure the pitch of the songs in the playlists, so for now I use the 'loudness' as extra indicator.
+
+Results
+-----------------------------------------------
+
+
+### First Results
 So far it seems that my own playlist is less sad than the Top 50 Nederland. Minor is 31% against 40% in Top 50 Nederland. My mean tempo is 120 BPM (sd= 31.7) against 116 BPM (sd= 24,0) For loudness the outcome for my most listened 2018 has a mean of -8,06 ; sd= 3,55. For Top50NL it has a mean of -6,64 with sd= 2,84.
 
+### Formula
 I can make a formule to calculate the sadness (because of the different in numbers this formulate is not really accurate, but it is a sketch for futher steps).
 
 Sadness= 3mode -2(tempo/1000) -loudness/10.
@@ -39,33 +47,42 @@ Sadness(Top50NL)= 3x0,40 - 2x0,116 + 0,664 = 1.632
 
 Sadness(My2018)= 3x0,31 - 2x0,120 + 0,806 = 1.976
 
+Goals
+-----------------------------------------------------------
+
+
+
 My goal is to create a formule that which takes these aspects in a 3:2:1 ratio and is based on a 1 to 100 scale.
 
 Imported to keep in mind for the next weeks is that aspects as tempo and loudness are not well measured for songs with long silent intros, like You- The 1975. Those kind of songs are better left behind. While googling for these statistics I found out that Spotify has a correctness chance, this is something to use in the next weeks.
 
 I would also prefer to use Last.fm for my statistics, because I spend a big amount of my music listening on YouTube.
 
-### 'You listen to such depressing music!'
 
-## Week 7 Data Visualisation
 
-First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with the 'Top2000' of the Netherlands (of 2018, I made my own playlist also in 2018). Good to notice is that my own playlist (called 'mijn') is 3x as big as the Top2000. It is hard to decide what kind of playlist is best fitting for my project. Because I'm comparing my own music to 'normal' music, I should have a playlist that consist of songs that are most listened. So far I can't find a playlist like that. The Top2000 of the Netherlands is best fitting in a way that it is first of all relative big. Secondly it shows songs that are most known by the Dutch population, which I'm a part of.  
-Dr. Burgoyne told us in the last lecture that Energy and Valence are mostly used in music cognition for measuring emotion is music. This made me change my way of doing it in the research, so for now on I'll use energy, valence, mode and tempo as variables.The example visualisation dr. Burgoyne made for our lecture was luckily for me fitting for my portfolio!
+'You listen to such depressing music!'
+======================================================
+
+
+Comparement and variables
+------------------------------------------------
+
+
+First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with a playlist that consists of 10.000, based on the most famous songs per genre. Good to notice is that this playlist is almost twice as big as my own playlist (10K versus 6K) It is hard to decide what kind of playlist is best fitting for my project. Because I'm comparing my own music to 'normal' music, I should have a playlist that consist of songs that are most listened, and known by the greatest amount of people.  
+
+Dr. Burgoyne told us in the last lecture that Energy and Valence are mostly used in music cognition for measuring emotion is music. This made me change my way of doing it in the research, so for now on I'll use energy, valence, mode, loudness and tempo as variables.The example visualisation dr. Burgoyne made for our lecture was luckily for me fitting for my portfolio!
+
+Based on what Dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, loudness, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. Besides I changed the way minor/minor was visualised in colors and added tempo to the alpha factor. 
  
 
-
- ### Here are the visualisations.
- 
- 
-I started off with making a easy bargraph to compare the major/minor difference per playlist: 
-![BarGraphColor](BarGraphColor.png)
-
-Because the playlists differ in amount of songs, it is way better to visualise this with percentages. 
+Visualisations
+---------------------------------------------------------
 
 
-As dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists.
 ````{r}
-# Download Grammy and Edison award playlists (pop) for 2019
+
+
+# Download the playlists for the comparement
 
 Thousand <- get_playlist_audio_features('thedoctorkto','54nv8jbrm4JoHEZ49Qvjgl')
 Mijn<- get_playlist_audio_features('11122548577','76MRLl4f6AvyYCrvs7X11P')
@@ -114,17 +131,279 @@ Mood %>%                       # Start with awards.
     x = "Valence",
     y = "Energy",
     colour = "Mode")
+
+
+```
+ 
+Conclusion
+---------------------------------------------
+
+
+
+While the 10K playlist makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
+
+The 1975
+===============================================================================
+
+
+'Go down, soft sound'
+---------------------------------------------------------------------
+
+
+
+One thing is clear, my all time favorite artist is the British band The 1975. I can give a whole TedTalk why this is the best band ever, but I will give you one reason in this project
+Every album, they start off with the same song, 'The 1975'. Same lyrics, but different in style. As a prelude, the band introduces the style of the album with this song. But how much do these versions actually differ? Time to use the track analysis. 
+
+
+Analysis
+----------------------------------------------------------
+
+
+```{r}
+#' Get a tidy audio analysis from Spotify.
+#'
+#' spotifyr returns Spotify's audio analysis as a large list. This function
+#' uses list columns to create a structure that works more richly within the
+#' tidyverse.
+get_tidy_audio_analysis <- function(track_uri, ...) 
+{
+    get_track_audio_analysis(track_uri, ...) %>% 
+        list %>% transpose %>% as_tibble %>% 
+        mutate_at(vars(meta, track), . %>% map(as_tibble)) %>% 
+        unnest(meta, track) %>% 
+        select(
+            analyzer_version,
+            duration,
+            contains('fade'),
+            ends_with('confidence'),
+            bars:segments) %>% 
+        mutate_at(
+            vars(bars, beats, tatums, sections), 
+            . %>% map(bind_rows)) %>% 
+        mutate(
+            segments =
+                map(
+                    segments,
+                    . %>% 
+                        transpose %>% as_tibble %>% 
+                        unnest(.preserve = c(pitches, timbre)) %>% 
+                        mutate(
+                            pitches = 
+                                map(
+                                    pitches, 
+                                    . %>% 
+                                        flatten_dbl %>% 
+                                        set_names(
+                                            c( 
+                                                'C', 'C#|Db', 'D', 'D#|Eb', 
+                                                'E', 'F', 'F#|Gb', 'G',
+                                                'G#|Ab', 'A', 'A#|Bb', 'B'))),
+                            timbre = 
+                                map(
+                                    timbre,
+                                    . %>% 
+                                        flatten_dbl %>% 
+                                        set_names(
+                                            c(
+                                                'c1', 'c2', 'c3', 'c4', 
+                                                'c5', 'c6', 'c7', 'c8',
+                                                'c9', 'c10', 'c11', 'c12'))))))
+}
 ```
 
- 
- Because I was not completely happy with the way the major/minor differences was visualised, I changed the pallette to 'Set1', which gave me a red/blue distinction. It kinda looks like an abstract painting now! 
-  ![PlaylistVxE](PlaylistVxER.png)
-  
-  While the Top2000 makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
-  
- In the graphics it is clear to see that my own playlist is alot bigger than the Top2000. For now it is not that big of deal, because the clusters are visible. 
 
-### Credit
+```{r}
+#' Normalise vectors for Computational Musicology.
+#'
+#' We use a number of normalisation strategies in Computational Musicology.
+#' This function brings them together into one place, along with common
+#' alternative names.
+compmus_normalise <- compmus_normalize <- function(v, method = "euclidean")
+{
+    ## Supported functions
+    
+    harmonic  <- function(v) v * sum(1 / abs(v))
+    manhattan <- function(v) v / sum(abs(v))
+    euclidean <- function(v) v / sqrt(sum(v^2))
+    chebyshev <- function(v) v / max(abs(v))
+    clr       <- function(v) {lv <- log(v); lv - mean(lv)}
+    
+    ## Method aliases
+    
+    METHODS <-
+        list(
+            harmonic  = harmonic,
+            manhattan = manhattan,
+            L1        = manhattan,
+            euclidean = euclidean,
+            L2        = euclidean,
+            chebyshev = chebyshev,
+            maximum   = chebyshev,
+            aitchison = clr,
+            clr       = clr)
+    
+    ## Function selection
+    
+
+    if (!is.na(i <- pmatch(method, names(METHODS))))
+        METHODS[[i]](v)
+    else 
+        stop('The method name is ambiguous or the method is unsupported.')
+}
+
+#' Compute pairwise distances for Computational Musicology in long format.
+#'
+#' We use a number of distance measures in Computational Musicology.
+#' This function brings them together into one place, along with common
+#' alternative names. It is designed for convenience, not speed.
+compmus_long_distance <- function(xdat, ydat, feature, method = "euclidean")
+{
+    
+    feature <- enquo(feature)
+    
+    ## Supported functions
+    
+    manhattan <- function(x, y) sum(abs(x - y))
+    euclidean <- function(x, y) sqrt(sum((x - y) ^ 2))
+    chebyshev <- function(x, y) max(abs(x - y))
+    pearson   <- function(x, y) 1 - cor(x, y)
+    cosine    <- function(x, y)
+    {
+        1 - sum(compmus_normalise(x, "euc") * compmus_normalise(y, "euc"))
+    }
+    angular   <- function(x, y) 2 * acos(1 - cosine(x, y)) / pi
+    aitchison <- function(x, y)
+    {
+        euclidean(compmus_normalise(x, "clr"), compmus_normalise(y, "clr"))
+    }
+    
+    ## Method aliases
+    
+    METHODS <-
+        list(
+            manhattan   = manhattan,
+            cityblock   = manhattan,
+            taxicab     = manhattan,
+            L1          = manhattan,
+            totvar      = manhattan,
+            euclidean   = euclidean,
+            L2          = euclidean,
+            chebyshev   = chebyshev,
+            maximum     = chebyshev,
+            pearson     = pearson,
+            correlation = pearson,
+            cosine      = cosine,
+            angular     = angular,
+            aitchison   = aitchison)
+    
+    ## Function selection
+    
+    if (!is.na(i <- pmatch(method, names(METHODS))))
+        bind_cols(
+            crossing(
+                xdat %>% select(xstart = start, xduration = duration),
+                ydat %>% select(ystart = start, yduration = duration)),
+            xdat %>% select(x = !!feature) %>% 
+                crossing(ydat %>% select(y = !!feature)) %>% 
+                transmute(d = map2_dbl(x, y, METHODS[[i]])))
+    else 
+        stop('The method name is ambiguous or the method is unsupported.')
+}
+```
+
+```{r}
+#' Gathers chroma vectors into long format.
+#'
+#' Gathers chroma vectors into long format for Computational Musicology.
+compmus_gather_chroma <- function(data)
+{
+    data %>% 
+    mutate(pitches = map(pitches, bind_rows)) %>% unnest(pitches) %>% 
+    gather("pitch_class", "value", C:B) %>% 
+    mutate(pitch_class = fct_shift(factor(pitch_class), 3))
+}
+```
+
+```{r}
+#Get analysis for The 1975 (ABIIOR) - Me
+  
+  The1975ABIIOR <- 
+    get_tidy_audio_analysis('7dvM0LbJ4pu1tDJnCH1Ahg') %>% 
+    select(segments) %>% unnest(segments) %>% 
+    select(start, duration, pitches)
+
+  The1975ILWYSYSBYSUOI <- 
+    get_tidy_audio_analysis('4LyEonRJ0clC020Yz3Qtk6') %>% 
+    select(segments) %>% unnest(segments) %>% 
+    select(start, duration, pitches)
+  
+  The1975 <- 
+    get_tidy_audio_analysis('2RWikgBoqBM5nu9GXPYNhq') %>% 
+    select(segments) %>% unnest(segments) %>% 
+    select(start, duration, pitches)
+  
+```
+## The 1975 (ABIIOR)
+
+```{r}
+#To make the graphic
+  The1975ABIIOR %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
+    compmus_gather_chroma %>% 
+    ggplot(
+      aes(
+        x = start + duration / 2, 
+        width = duration, 
+        y = pitch_class, 
+        fill = value)) + 
+    geom_tile() +
+    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
+    theme_minimal()
+```
+## The 1975 ILWYSYSBYSUOI
+```{r}
+  The1975ILWYSYSBYSUOI %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
+    compmus_gather_chroma %>% 
+    ggplot(
+      aes(
+        x = start + duration / 2, 
+        width = duration, 
+        y = pitch_class, 
+        fill = value)) + 
+    geom_tile() +
+    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
+    theme_minimal()
+```
+###The 1975 (The1975)
+```{r}
+  
+    The1975 %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
+    compmus_gather_chroma %>% 
+    ggplot(
+      aes(
+        x = start + duration / 2, 
+        width = duration, 
+        y = pitch_class, 
+        fill = value
+        )) + 
+    geom_tile() +
+    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
+    theme_minimal()
+
+
+```
+conclusion
+-----------------------------------------------------------------------------
+
+
+Credits
+===============================================================================
+
+### Student
 Made by Mariëlle Baelemans, 2019. For info: marielle.baelemans@student.uva.nl. 
-This portfolio is part of the Computational Musicology course, given by the Musicology department of the University Amsterdam. 
+
+### University 
+This portfolio is part of the Computational Musicology course, given by the Musicology department of the University of Amsterdam. 
 
