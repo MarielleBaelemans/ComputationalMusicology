@@ -8,7 +8,8 @@ output:
 theme: lumen
 orientation: columns
 ---
-  
+`r knitr::opts_chunk$set(cache = TRUE)` 
+
 ```{r}
 # In order to use these packages, we need to install flexdashboard, plotly, and Cairo.
 library(tidyverse)

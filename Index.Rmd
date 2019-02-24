@@ -6,17 +6,18 @@ output:
   flexdashboard::flex_dashboard:
   storyboard: true
 theme: lumen
-orientation: columns
+
 ---
-`r knitr::opts_chunk$set(cache = TRUE)` 
+
+ 
 
 ```{r}
 # In order to use these packages, we need to install flexdashboard, plotly, and Cairo.
 library(tidyverse)
 library(plotly)
 library(spotifyr)
-Sys.setenv(SPOTIFY_CLIENT_ID = 'e944328ebc754d5dae4607ba0b9b7aa0')
-Sys.setenv(SPOTIFY_CLIENT_SECRET = '32c46cc6766a44dfb68e24f7a1aae5b6')
+source('spotify.R')
+
 
 ```
 
@@ -24,7 +25,7 @@ Sad Music?!
 ==========================================
 
 Spotify API- Week 7
--------------------------------------------
+
 
 
 ###Introduction 
@@ -32,8 +33,8 @@ Spotify API- Week 7
 For this project I want to use the findings out of an earlier Musicology project. In my research on what makes music 'sad' I found that the minor aspect is the thing what makes music sad. Besides that aspect, also slowness and low pitch are important for giving a listener a sad feeling. My big goal for this portfolio project is to make a widget that measures how sad someone's playlist is by comparing these factors in a 3:2:1 ratio. With these outcomes I want to make a day by day scheme for how 'sad' your day was according to the songs you listened that day. A calendar that shows your mood based on the music you listen ;). For now this is a too big goal, for this project my research question is 'What is the mood of my own music, compared to most listenend pophits?
 So my first step is to compare the major/minor- ratio and the mean tempo of my own playlist 'Most listened 2018' to 'Top 50 Nederland' playlist. I have not found a way yet to measure the pitch of the songs in the playlists, so for now I use the 'loudness' as extra indicator.
 
-Results
------------------------------------------------
+
+***
 
 
 ### First Results
@@ -48,10 +49,9 @@ Sadness(Top50NL)= 3x0,40 - 2x0,116 + 0,664 = 1.632
 
 Sadness(My2018)= 3x0,31 - 2x0,120 + 0,806 = 1.976
 
-Goals
------------------------------------------------------------
+***
 
-
+###Goals
 
 My goal is to create a formule that which takes these aspects in a 3:2:1 ratio and is based on a 1 to 100 scale.
 
@@ -65,9 +65,7 @@ I would also prefer to use Last.fm for my statistics, because I spend a big amou
 ======================================================
 
 
-Comparement and variables
-------------------------------------------------
-
+###Comparement and variables
 
 First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with a playlist that consists of 10.000, based on the most famous songs per genre. Good to notice is that this playlist is almost twice as big as my own playlist (10K versus 6K) It is hard to decide what kind of playlist is best fitting for my project. Because I'm comparing my own music to 'normal' music, I should have a playlist that consist of songs that are most listened, and known by the greatest amount of people.  
 
@@ -75,9 +73,9 @@ Dr. Burgoyne told us in the last lecture that Energy and Valence are mostly used
 
 Based on what Dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, loudness, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. Besides I changed the way minor/minor was visualised in colors and added tempo to the alpha factor. 
  
+*** 
 
-Visualisations
----------------------------------------------------------
+###Visualisations
 
 
 ````{r}
@@ -96,14 +94,14 @@ Mood <-
 
 # Code by Ashley -> my research
 
-Mood %>%                       # Start with awards.
+Graphplaylists<-Mood %>%                       # Start with awards.
   ggplot(                      # Set up the plot.
     aes(
       x = valence,
       y = energy,
       size = loudness,            #Let op: tempo ipv loudness
       colour = mode,
-      alpha= tempo,
+      alpha= 0.5,
     )
   )+
   geom_point() +               # Scatter plot.
@@ -133,11 +131,14 @@ Mood %>%                       # Start with awards.
     y = "Energy",
     colour = "Mode")
 
+ggplotly(Graphplaylists)
 
 ```
- 
-Conclusion
----------------------------------------------
+
+*** 
+
+###Conclusion
+
 
 
 
@@ -147,17 +148,17 @@ The 1975
 ===============================================================================
 
 
-'Go down, soft sound'
----------------------------------------------------------------------
+###'Go down, soft sound'
+
 
 
 
 One thing is clear, my all time favorite artist is the British band The 1975. I can give a whole TedTalk why this is the best band ever, but I will give you one reason in this project
 Every album, they start off with the same song, 'The 1975'. Same lyrics, but different in style. As a prelude, the band introduces the style of the album with this song. But how much do these versions actually differ? Time to use the track analysis. 
 
+***
 
-Analysis
-----------------------------------------------------------
+###Analysis
 
 
 ```{r}
@@ -326,6 +327,7 @@ compmus_gather_chroma <- function(data)
 ```
 
 ```{r}
+
 #Get analysis for The 1975 (ABIIOR) - Me
   
   The1975ABIIOR <- 
@@ -344,7 +346,10 @@ compmus_gather_chroma <- function(data)
     select(start, duration, pitches)
   
 ```
-## The 1975 (ABIIOR)
+
+###The 1975 (ABIIOR)
+
+
 
 ```{r}
 #To make the graphic
@@ -361,7 +366,12 @@ compmus_gather_chroma <- function(data)
     labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
     theme_minimal()
 ```
-## The 1975 ILWYSYSBYSUOI
+
+
+###The 1975 ILWYSYSBYSUOI
+
+
+
 ```{r}
   The1975ILWYSYSBYSUOI %>% 
     mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
@@ -376,7 +386,13 @@ compmus_gather_chroma <- function(data)
     labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
     theme_minimal()
 ```
-###The 1975 (The1975)
+
+
+### The 1975 (The1975)
+
+
+
+
 ```{r}
   
     The1975 %>% 
@@ -393,10 +409,15 @@ compmus_gather_chroma <- function(data)
     labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
     theme_minimal()
 
-
 ```
-conclusion
------------------------------------------------------------------------------
+
+
+
+
+***
+
+###conclusion
+
 
 
 Credits
