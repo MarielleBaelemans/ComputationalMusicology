@@ -305,7 +305,7 @@ compmus_gather_timbre <- function(data)
 
 ```
 
-### Sad Music?!
+### Sad Music?! - Introduction
 
 
 ***
@@ -339,7 +339,8 @@ I would also prefer to use Last.fm for my statistics, because I spend a big amou
 
 
 
-### 'You listen to such depressing music!'
+### 'You listen to such depressing music!' - My music vs Pop music
+
 ![comparementgraph](ComparementGraph.png)
 
 *** 
@@ -357,7 +358,7 @@ Based on what Dr. Burgoyne told in the lecture, for this research I will use: mo
 While the 10K playlist makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
 
 
-### 'Go down, soft sound'
+### 'Go down, soft sound' - Pitches between song styles
 
 
 
@@ -609,7 +610,7 @@ compmus_gather_chroma <- function(data)
 One thing is clear, my all time favorite artist is the British band The 1975. I can give a whole TedTalk why this is the best band ever, but I will give you one reason in this project
 Every album, they start off with the same song, 'The 1975'. Same lyrics, but different in style. As a prelude, the band introduces the style of the album with this song. But how much do these versions actually differ? Time to use the track analysis. 
 
-### 'You're intertwining your soul with somebody else'
+### 'You're intertwining your soul with somebody else'- Comparement between versions
 
  
 ```{r}
@@ -647,163 +648,9 @@ compmus_long_distance(
 My most listened song of The 1975 is 'Somebody Else'. This song has two versions, a normal and an 'Alt' version. In my opinion, the  versions do not differ so much, by ear. Let's use this analysis to see whether I am right or not!
 As you can see,the versions of The 1975 differ a bit in pitches. Somebody Else seems only to differ in the bridge part of the song. 
 
-###'Poppy' versus instrumental  Chroma
+###'Poppy' versus instrumental - Chroma
 
-
-```{r}
-library(tidyverse)
-library(spotifyr)
-
-```
-
-
-```{r}
-
-Robbers <- 
-    get_tidy_audio_analysis('73jVPicY2G9YHmzgjk69ae') %>% 
-    compmus_align(bars, segments) %>% 
-    select(bars) %>% unnest(bars) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'rms', norm = 'euclidean')) %>% 
-    mutate(
-        timbre = 
-            map(segments, 
-                compmus_summarise, timbre, 
-                method = 'mean'))
-Chocolate <- 
-    get_tidy_audio_analysis('4WiiRw2PHMNQE0ad6y6GdD') %>% 
-    compmus_align(bars, segments) %>% 
-    select(bars) %>% unnest(bars) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'rms', norm = 'euclidean')) %>% 
-    mutate(
-        timbre = 
-            map(segments, 
-                compmus_summarise, timbre, 
-                method = 'mean'))
-PleaseBeNaked <- 
-    get_tidy_audio_analysis('7jS5cQ5GuGkPPdIoUUct0P') %>% 
-    compmus_align(bars, segments) %>% 
-    select(bars) %>% unnest(bars) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'rms', norm = 'euclidean')) %>% 
-    mutate(
-        timbre = 
-            map(segments, 
-                compmus_summarise, timbre, 
-                method = 'mean'))
-
-Robbersplot <- 
-    bind_rows(
-        Robbers %>% compmus_self_similarity(pitches, 'aitchison') %>% mutate(d = d / max(d), type = "Chroma"),
-      Robbers %>% compmus_self_similarity(timbre, 'euclidean') %>% mutate(d = d / max(d), type = "Timbre")) %>% 
-    ggplot(
-        aes(
-            x = xstart + xduration / 2, 
-            width = xduration,
-            y = ystart + yduration / 2,
-            height = yduration,
-            fill = d)) + 
-    geom_tile() +
-    coord_fixed() +
-    facet_wrap(~ type) +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    theme_classic() +
-    labs(x = '', y = '')
-ggplotly(Robbersplot)
-
-Chocolateplot <- 
-    bind_rows(
-        Chocolate %>% compmus_self_similarity(pitches, 'aitchison') %>% mutate(d = d / max(d), type = "Chroma"),
-       Chocolate %>% compmus_self_similarity(timbre, 'euclidean') %>% mutate(d = d / max(d), type = "Timbre")) %>% 
-    ggplot(
-        aes(
-            x = xstart + xduration / 2, 
-            width = xduration,
-            y = ystart + yduration / 2,
-            height = yduration,
-            fill = d)) + 
-    geom_tile() +
-    coord_fixed() +
-    facet_wrap(~ type) +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    theme_classic() +
-    labs(x = '', y = '')
-ggplotly(Chocolateplot)
-
-PleaseBeNakedplot <- 
-    bind_rows(
-        PleaseBeNaked %>% compmus_self_similarity(pitches, 'aitchison') %>% mutate(d = d / max(d), type = "Chroma"),
-        PleaseBeNaked %>% compmus_self_similarity(timbre, 'euclidean') %>% mutate(d = d / max(d), type = "Timbre")) %>% 
-    ggplot(
-        aes(
-            x = xstart + xduration / 2, 
-            width = xduration,
-            y = ystart + yduration / 2,
-            height = yduration,
-            fill = d)) + 
-    geom_tile() +
-    coord_fixed() +
-    facet_wrap(~ type) +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    theme_classic() +
-    labs(x = '', y = '')
-ggplotly(PleaseBeNakedplot)
-```
-```
-```
-
-```{r}
-Robbers %>% 
-    compmus_gather_timbre %>% 
-    ggplot(
-        aes(
-            x = start + duration / 2, 
-            width = duration, 
-            y = basis, 
-            fill = value,
-            label="Chocolate")) + 
-    geom_tile() +
-    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
-    scale_fill_viridis_c(option = 'E') +
-    theme_classic()
-
-Chocolate%>% 
-    compmus_gather_timbre %>% 
-    ggplot(
-        aes(
-            x = start + duration / 2, 
-            width = duration, 
-            y = basis, 
-            fill = value,
-            label= "Chocolate")) + 
-    geom_tile() +
-    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
-    scale_fill_viridis_c(option = 'E') +
-    theme_classic()
-
-PleaseBeNaked%>% 
-    compmus_gather_timbre %>% 
-    ggplot(
-        aes(
-            x = start + duration / 2, 
-            width = duration, 
-            y = basis, 
-            fill = value,
-            label= "Chocolate")) + 
-    geom_tile() +
-    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
-    scale_fill_viridis_c(option = 'E') +
-    theme_classic()
+Okay this part is not working yet due a weird error, will try to figure it out in the next few days! 
 ```
 
 ###Credits
