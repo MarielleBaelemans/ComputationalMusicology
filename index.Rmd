@@ -308,8 +308,10 @@ compmus_gather_timbre <- function(data)
 ### Sad Music?! - Introduction
 
 
-***
+
 ![SadMusicMeme](sadmusicmeme.jpg)
+
+***
 
 **Introduction**
 
@@ -659,6 +661,6 @@ Okay this part is not working yet due a weird error, will try to figure it out i
 **Student**
 Made by Marielle Baelemans, 2019. For info: marielle.baelemans@student.uva.nl. 
 
-** University ** 
+**University** 
 This portfolio is part of the Computational Musicology course, given by the Musicology department of the University of Amsterdam. 
 
