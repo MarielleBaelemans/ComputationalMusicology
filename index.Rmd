@@ -309,7 +309,10 @@ compmus_gather_timbre <- function(data)
 
 
 
-![SadMusicMeme](sadmusicmeme.jpg)
+![Sad Music Meme](sadmusicmeme.jpg)
+
+! 
+![Results AOC](ResultsAO.jpg)
 
 ***
 
@@ -319,9 +322,11 @@ For this project I want to use the findings out of an earlier Musicology project
 So my first step is to compare the major/minor- ratio and the mean tempo of my own playlist 'Most listened 2018' to 'Top 50 Nederland' playlist. I have not found a way yet to measure the pitch of the songs in the playlists, so for now I use the 'loudness' as extra indicator.
 
 **First Results**
+
 So far it seems that my own playlist is less sad than the Top 50 Nederland. Minor is 31% against 40% in Top 50 Nederland. My mean tempo is 120 BPM (sd= 31.7) against 116 BPM (sd= 24,0) For loudness the outcome for my most listened 2018 has a mean of -8,06 ; sd= 3,55. For Top50NL it has a mean of -6,64 with sd= 2,84.
 
-** Formula**
+**Formula**
+
 I can make a formule to calculate the sadness (because of the different in numbers this formulate is not really accurate, but it is a sketch for futher steps).
 
 Sadness= 3mode -2(tempo/1000) -loudness/10.
@@ -343,7 +348,7 @@ I would also prefer to use Last.fm for my statistics, because I spend a big amou
 
 ### 'You listen to such depressing music!' - My music vs Pop music
 
-![comparementgraph](ComparementGraph.png)
+![Comparement Graph](ComparementGraph.png)
 
 *** 
 
@@ -360,7 +365,7 @@ Based on what Dr. Burgoyne told in the lecture, for this research I will use: mo
 While the 10K playlist makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
 
 
-### 'Go down, soft sound' - Pitches between song styles
+### 'Go down, soft sound' - Same song, different style, pitch?
 
 
 
@@ -563,18 +568,12 @@ compmus_gather_chroma <- function(data)
         x = start + duration / 2, 
         width = duration, 
         y = pitch_class, 
-        fill = value)) + 
+        fill = value
+        )) + 
     geom_tile() +
     labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
     theme_minimal()
-```
 
-
-
-
-
-
-```{r}
   The1975ILWYSYSBYSUOI %>% 
     mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
     compmus_gather_chroma %>% 
@@ -583,16 +582,14 @@ compmus_gather_chroma <- function(data)
         x = start + duration / 2, 
         width = duration, 
         y = pitch_class, 
-        fill = value)) + 
+        fill = value
+        )) + 
     geom_tile() +
     labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
-    theme_minimal()
-```
-
-
-```{r}
+    theme_minimal() 
+   
   
-    The1975 %>% 
+ The1975 %>% 
     mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
     compmus_gather_chroma %>% 
     ggplot(
@@ -605,12 +602,20 @@ compmus_gather_chroma <- function(data)
     geom_tile() +
     labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
     theme_minimal()
+   
+
+
 
 ```
 
 *** 
+
+**Case Study: The 1975**
+
 One thing is clear, my all time favorite artist is the British band The 1975. I can give a whole TedTalk why this is the best band ever, but I will give you one reason in this project
 Every album, they start off with the same song, 'The 1975'. Same lyrics, but different in style. As a prelude, the band introduces the style of the album with this song. But how much do these versions actually differ? Time to use the track analysis. 
+
+**Conclusion**
 
 ### 'You're intertwining your soul with somebody else'- Comparement between versions
 
@@ -647,13 +652,42 @@ compmus_long_distance(
 ```
 
 *** 
+**Alt versus normal version - Long distance comparement**
 My most listened song of The 1975 is 'Somebody Else'. This song has two versions, a normal and an 'Alt' version. In my opinion, the  versions do not differ so much, by ear. Let's use this analysis to see whether I am right or not!
+
 As you can see,the versions of The 1975 differ a bit in pitches. Somebody Else seems only to differ in the bridge part of the song. 
 
-###'Poppy' versus instrumental - Chroma
+### The 'Colorness' of PopMusic - Timbre
 
-Okay this part is not working yet due a weird error, will try to figure it out in the next few days! 
-```
+![Robbers](RobbersTimbre.jpg)
+![Chocolate](ChocolateTimbre.jpg)
+![PleaseBeNaked](PleaseBeNakedTimbre.jpg)
+
+***
+
+** DISCLAIMER: THE PLOTS DID NOT WORK WITHIN THIS FILE, SO YOU SEE .JPG VERSIONS OF THE PLOTS**
+
+**Style differences**
+
+Another key charastic of The 1975 is their use of different styles between songs. My favourite song, 'Robbers' is quite a pop song. Their most famous song, 'Chocolate' is one of the most 'wannabe boyband popsong of the '10's' you could think of. However 'Please Be Naked' is a completely instrumental, in a piano/electronic way. 
+
+**Conclusion**
+
+As you can see out of the plots, the most colorfull one in all 12 sections is the instrumental 'Please Be Naked'. 'Chocolate' is almost completely blue and 'Robbers' has a little yellow, meaning that the more 'poppy' a song is, the less timbre it has. 
+
+### The Segmentation of PopMusic 
+
+![Robbers](RobbersSegmentation.jpg)
+![Chocolate](ChocolateSegmentation.jpg)
+![PleaseBeNaked](PleaseBeNakedSegmentation.jpg)
+
+***
+
+** DISCLAIMER: THE PLOTS DID NOT WORK WITHIN THIS FILE, SO YOU SEE .JPG VERSIONS OF THE PLOTS**
+
+**Style differences**
+
+Using the same three songs of previous plot, you can also see that the popsongs have a clear bridge convention. The 'Please Be Naked' song, however, has a clear segmentations in it. 
 
 ###Credits
 
