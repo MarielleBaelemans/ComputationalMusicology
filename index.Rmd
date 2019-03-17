@@ -14,7 +14,9 @@ output:
 
 # In order to use these packages, we need to install flexdashboard, plotly, and Cairo.
 library(tidyverse)
+library(tidymodels)
 library(plotly)
+library(dplyr)
 library(spotifyr)
 library(compmus)
 source('spotify.R')
@@ -64,7 +66,7 @@ I would also prefer to use Last.fm for my statistics, because I spend a big amou
 ### 'You listen to such depressing music!' (72)
 My own playlist (6,000 songs) comparement with a playlist of hits in all popgenres (10,000). 
 
-![This is a JPEG image because of the large amount of data](ComparementGraph.png)
+![This is a JPEG image due of the large amount of data](ComparementGraph.png)
 
 *** 
 
@@ -347,8 +349,9 @@ PleaseBeNaked %>%
 ``` 
 *** 
 
-In the comparement of tonal analysis you can see that... 
+In the comparement of tonal analysis you can see that they are mostly the same. All blue graphs. 
 ### Low level features (116)
+
 ```{r}
 Mijn<-
     get_playlist_audio_features(
@@ -410,65 +413,238 @@ Comparement%>%
     scale_fill_viridis_d() +
     labs(x = 'Spotify Timbre Coefficients', y = '', fill = 'Playlist')
 ```
+*** 
+These low level features show once again that my own playlist is quite different from the pop playlist. 
+
+
+
 ***
 Once again, these low level features show that my playlist is quite different from the popplaylist. 
 
 ###Classification (127)
 
 ```{r}
-PleaseBeNaked <- 
-    get_tidy_audio_analysis('7jS5cQ5GuGkPPdIoUUct0P') %>% 
-    select(segments) %>% unnest(segments)
+SadSongs<- 
+    get_playlist_audio_features('spotify', '37i9dQZF1DX7qK8ma5wgG1') %>% 
+    slice(1:20) %>% 
+    add_audio_analysis
+HappyTunes <- 
+    get_playlist_audio_features('spotify', '37i9dQZF1DX9u7XXOp0l5L') %>% 
+    slice(1:20) %>% 
+    add_audio_analysis
+Mar19 <- 
+    get_playlist_audio_features('11122548577', '6eEo9NEapZSsUPlE7ZSjvU') %>% 
+    slice(1:20) %>% 
+    add_audio_analysis
 ```
 
-```{r}
-PleaseBeNaked %>% 
-    mutate(loudness_max_time = start + loudness_max_time) %>% 
-    arrange(loudness_max_time) %>% 
-    mutate(delta_loudness = loudness_max - lag(loudness_max)) %>% 
-    ggplot(aes(x = loudness_max_time, y = pmax(0, delta_loudness))) +
-    geom_line() +
-    xlim(0, 30) +
-    theme_minimal() +
-    labs(x = 'Time (s)', y = 'Novelty')
-```
 
 ```{r}
-PleaseBeNaked %>% 
+Comparement6 <- 
+    SadSongs %>% mutate(playlist = "Sad Songs") %>% 
+    bind_rows(
+        HappyTunes %>% mutate(playlist = "Happy Tunes"),
+        Mar19 %>% mutate(playlist = "Mar19")) %>% 
+    mutate(playlist = factor(playlist)) %>% 
+    mutate(
+        segments = 
+            map2(segments, key, compmus_c_transpose)) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'),
+        timbre =
+            map(
+                segments,
+                compmus_summarise, timbre,
+                method = 'mean')) %>% 
     mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
-    arrange(start) %>% 
-    mutate(pitches = map2(pitches, lag(pitches), `-`)) %>% 
-    compmus_gather_chroma %>% 
-    ggplot(
-        aes(
-            x = start + duration / 2, 
-            width = duration, 
-            y = pitch_class, 
-            fill = pmax(0, value))) + 
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    xlim(0, 30) +
-    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
-    theme_classic()
+    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
+    unnest(pitches, timbre)
+```
+
+
+```{r}
+Comparement6_class <- 
+    recipe(playlist ~
+               danceability +
+               energy +
+               loudness +
+               speechiness +
+               acousticness +
+               instrumentalness +
+               liveness +
+               valence +
+               tempo +
+               duration_ms +
+               C + `C#|Db` + D + `D#|Eb` +
+               E + `F` + `F#|Gb` + G +
+               `G#|Ab` + A + `A#|Bb` + B +
+               c01 + c02 + c03 + c04 + c05 + c06 +
+               c07 + c08 + c09 + c10 + c11 + c12,
+           data = Comparement6) %>% 
+    step_center(all_predictors()) %>%
+    step_scale(all_predictors()) %>%
+    # step_range(all_predictors()) %>% 
+    prep(Comparement6) %>% 
+    juice
+```
+
+
+```{r}
+Comparement6_cv <- Comparement6_class %>% vfold_cv(5)
+```
+```{r}
+Comparement6_knn <- nearest_neighbor(neighbors = 1) %>% set_engine('kknn')
+predict_knn <- function(split)
+    fit(Comparement6_knn, playlist ~ ., data = analysis(split)) %>% 
+    predict(assessment(split), type = 'class') %>%
+    bind_cols(assessment(split))
+```
+
+
+
+```{r}
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
+    conf_mat(truth = playlist, estimate = .pred_class)
+```
+
+
+
+```{r}
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
+    conf_mat(truth = playlist, estimate = .pred_class) %>% 
+    autoplot(type = 'mosaic')
 ```
 
 ```{r}
-PleaseBeNaked %>% 
-    arrange(start) %>% 
-    mutate(timbre = map2(timbre, lag(timbre), `-`)) %>% 
-    compmus_gather_timbre %>% 
-    ggplot(
-        aes(
-            x = start + duration / 2, 
-            width = duration, 
-            y = basis, 
-            fill = pmax(0, value))) + 
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    xlim(0, 30) +
-    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude') +
-    theme_classic()
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
+    conf_mat(truth = playlist, estimate = .pred_class) %>% 
+    autoplot(type = 'heatmap')
 ```
+
+
+
+```{r}
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
+    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
+```
+
+
+```{r}
+Comparement6_logistic <- logistic_reg() %>% set_engine('glm')
+predict_logistic <- function(split)
+    fit(indie_logistic, playlist ~ ., data = analysis(split)) %>% 
+    predict(assessment(split), type = 'class') %>%
+    bind_cols(assessment(split))
+```
+
+
+```{r}
+Comparement6_multinom <- multinom_reg(penalty = 0.1) %>% set_engine('glmnet')
+predict_multinom <- function(split)
+    fit(Comparement6_multinom, playlist ~ ., data = analysis(split)) %>% 
+    predict(assessment(split), type = 'class') %>%
+    bind_cols(assessment(split))
+```
+
+
+```{r}
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_multinom)) %>% unnest(pred) %>% 
+    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
+```
+
+
+```{r}
+Comparement6_class %>% 
+    fit(Comparement6_multinom, playlist ~ ., data = .) %>% 
+    pluck('fit') %>%
+    coef
+```
+
+
+```{r}
+Comparement6_tree <- decision_tree() %>% set_engine('C5.0')
+predict_tree <- function(split)
+    fit(Comparement6_tree, playlist ~ ., data = analysis(split)) %>% 
+    predict(assessment(split), type = 'class') %>%
+    bind_cols(assessment(split))
+```
+
+```{r}
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_tree)) %>% unnest(pred) %>% 
+    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
+```
+
+
+```{r}
+Comparement6_class %>% 
+    fit(Comparement6_tree, playlist ~ ., data = .) %>% 
+    pluck('fit') %>%
+    summary
+```
+
+
+```{r}
+Comparement6_forest <- rand_forest() %>% set_engine('randomForest')
+predict_forest <- function(split)
+    fit(Comparement6_forest, playlist ~ ., data = analysis(split)) %>% 
+    predict(assessment(split), type = 'class') %>%
+    bind_cols(assessment(split))
+```
+
+```{r}
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_forest)) %>% 
+    unnest(pred) %>% 
+    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
+```
+
+```{r}
+Comparent6_class %>% 
+    fit(Comparement6_forest, playlist ~ ., data = .) %>% 
+    pluck('fit') %>% 
+    randomForest::varImpPlot()
+```
+
+
+```{r}
+predict_knn_reduced <- function(split)
+    fit(
+        Comparement6_knn, 
+        playlist ~ c01 + c11 + liveness + energy + acousticness, 
+        data = analysis(split)) %>% 
+    predict(assessment(split), type = 'class') %>%
+    bind_cols(assessment(split))
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_knn_reduced)) %>% unnest(pred) %>% 
+    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
+```
+
+```{r}
+Comparement6_cv %>% 
+    mutate(pred = map(splits, predict_knn_reduced)) %>% unnest(pred) %>% 
+    conf_mat(truth = playlist, estimate = .pred_class) %>% 
+    autoplot(type = 'mosaic')
+```
+
+
+```{r}
+Comparement6 %>%
+    ggplot(aes(x = c01, y = c11, colour = playlist, size = liveness)) +
+    geom_point(alpha = 0.8) +
+    scale_color_brewer(type = 'qual', palette = 'Accent') +
+    labs(x = 'Timbre Component 1', y = 'Timbre Component 11', size = 'Liveness', colour = 'Playlist')
+```
+
+
 
 ***
 **Heartbeat**
