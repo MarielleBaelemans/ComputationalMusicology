@@ -17,6 +17,9 @@ library(tidyverse)
 library(tidymodels)
 library(plotly)
 library(dplyr)
+library(ggdendro)
+library(protoclust)
+library(heatmaply)
 library(spotifyr)
 library(compmus)
 source('spotify.R')
@@ -260,7 +263,9 @@ Robbers<-
         pitches = 
             map(segments, 
                 compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'))%>% 
+                method = 'mean', norm = 'manhattan'))
+RobbersPlot<-
+    Robbers%>%
     compmus_match_pitch_template(key_templates, 'aitchison', 'manhattan')%>% 
     ggplot(
         aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
@@ -269,7 +274,7 @@ Robbers<-
     theme_minimal() +
     labs(x = 'Time (s)', y = 'Robbers', fill = 'Distance')
 
-ggplotly(Robbers)
+ggplotly(RobbersPlot)
 
 PleaseBeNaked<- 
     get_tidy_audio_analysis('7jS5cQ5GuGkPPdIoUUct0P') %>% 
@@ -279,7 +284,9 @@ PleaseBeNaked<-
         pitches = 
             map(segments, 
                 compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'))%>% 
+                method = 'mean', norm = 'manhattan'))
+PleaseBeNakedPlot<-
+    PleaseBeNaked %>% 
     compmus_match_pitch_template(key_templates, 'aitchison', 'manhattan')%>% 
     ggplot(
         aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
@@ -288,7 +295,7 @@ PleaseBeNaked<-
     theme_minimal() +
     labs(x = 'Time (s)', y = 'PleaseBeNaked', fill = 'Distance')
 
-ggplotly(PleaseBeNaked)
+ggplotly(PleaseBeNakedPlot)
 
 Chocolate<- 
     get_tidy_audio_analysis('0KivRxhyT9xMen2cs3rJD3')%>% 
@@ -298,7 +305,9 @@ Chocolate<-
         pitches = 
             map(segments, 
                 compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'))%>% 
+                method = 'mean', norm = 'manhattan'))
+ChocolatePlot<-
+    Chocolate %>% 
     compmus_match_pitch_template(key_templates, 'aitchison', 'manhattan')%>% 
     ggplot(
         aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
@@ -307,7 +316,7 @@ Chocolate<-
     theme_minimal() +
     labs(x = 'Time (s)', y = 'Chocolate', fill = 'Distance')
 
-ggplotly(Chocolate)
+ggplotly(ChocolatePlot)
 ```
 
 
@@ -608,7 +617,33 @@ Comparement6_cv %>%
 ```
 
 ```{r}
-Comparent6_class %>% 
+Comparement6_class <- 
+    recipe(playlist ~
+               danceability +
+               energy +
+               loudness +
+               speechiness +
+               acousticness +
+               instrumentalness +
+               liveness +
+               valence +
+               tempo +
+               duration_ms +
+               C + `C#|Db` + D + `D#|Eb` +
+               E + `F` + `F#|Gb` + G +
+               `G#|Ab` + A + `A#|Bb` + B +
+               c01 + c02 + c03 + c04 + c05 + c06 +
+               c07 + c08 + c09 + c10 + c11 + c12,
+           data = Comparement6) %>% 
+    step_center(all_predictors()) %>%
+    step_scale(all_predictors()) %>%
+    # step_range(all_predictors()) %>% 
+    prep(Comparement6) %>% 
+    juice
+``` 
+
+```{r}
+Comparement6_class %>% 
     fit(Comparement6_forest, playlist ~ ., data = .) %>% 
     pluck('fit') %>% 
     randomForest::varImpPlot()
@@ -623,6 +658,7 @@ predict_knn_reduced <- function(split)
         data = analysis(split)) %>% 
     predict(assessment(split), type = 'class') %>%
     bind_cols(assessment(split))
+
 Comparement6_cv %>% 
     mutate(pred = map(splits, predict_knn_reduced)) %>% unnest(pred) %>% 
     metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
@@ -650,7 +686,84 @@ Comparement6 %>%
 **Heartbeat**
 The song Please Be Naked is charastic for the use of a heartbeat is prominent beat. The closer to the end of the song, the louder the heartbeat is. 
 
+###Clustering
+```{r}
+HappyxSad<- 
+    get_playlist_audio_features('11122548577','1C15xY2yKcbmOU7xzNwFlJ') %>% 
+    add_audio_analysis %>% 
+    mutate(
+        segments = 
+            map2(segments, key, compmus_c_transpose)) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'),
+        timbre =
+            map(
+                segments,
+                compmus_summarise, timbre,
+                method = 'mean')) %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
+    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
+    unnest(pitches, timbre)
+```
 
+```{r}
+HappyxSad_juice <- 
+    recipe(track_name ~
+               danceability +
+               energy +
+               loudness +
+               speechiness +
+               acousticness +
+               instrumentalness +
+               liveness +
+               valence +
+               tempo +
+               duration_ms +
+               C + `C#|Db` + D + `D#|Eb` +
+               E + `F` + `F#|Gb` + G +
+               `G#|Ab` + A + `A#|Bb` + B +
+               c01 + c02 + c03 + c04 + c05 + c06 +
+               c07 + c08 + c09 + c10 + c11 + c12,
+           data = HappyxSad) %>% 
+    step_center(all_predictors()) %>%
+    step_scale(all_predictors()) %>%
+    # step_range(all_predictors()) %>% 
+    prep(HappyxSad %>% mutate(track_name = str_trunc(track_name, 20))) %>% 
+    juice %>% 
+    column_to_rownames('track_name')
+```
+
+```{r}
+HappyxSad_dist <- dist(HappyxSad_juice, method = 'euclidean')
+```
+
+```{r}
+hclust(HappyxSad_dist, method = 'single') %>% dendro_data %>% ggdendrogram
+```
+
+```{r}
+protoclust(HappyxSad_dist) %>% dendro_data %>% ggdendrogram
+```
+
+```{r}
+kmeans(HappyxSad_juice, 2)
+```
+
+```{r}
+grDevices::dev.size("px")
+heatmaply(
+    HappyxSad_juice,
+    hclustfun = hclust,
+    # hclustfun = protoclust,
+    # Comment out the hclust_method line when using protoclust.
+    hclust_method = 'average',
+    dist_method = 'euclidean')
+```
+
+*** 
 ###Credits
 
 
