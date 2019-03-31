@@ -1,223 +1,415 @@
 ---
 title: "Sad Music"
 author: "Marielle Baelemans"
-date: "17 March 2019"
+date: "31 March 2019"
 output: 
-  flexdashboard::flex_dashboard:
-    storyboard: true
-    theme: lumen
-
+  flexdashboard::flex_dashboard
+    
+   
 ---
 
-```{r, cache = FALSE}
+<style>                     
+.navbar {
+  background-color:black;
+  border-color:black;
+}
+.navbar-brand {
+color:white!important;
+}
 
+.bgred {
+  background-color: #ffffff;
+}
+</style> 
+
+```{r, cache = FALSE}
+ knitr::opts_chunk$set(cache = TRUE)
 
 # In order to use these packages, we need to install flexdashboard, plotly, and Cairo.
 library(tidyverse)
 library(tidymodels)
 library(plotly)
 library(dplyr)
-library(ggdendro)
-library(protoclust)
-library(heatmaply)
 library(spotifyr)
 library(compmus)
 source('spotify.R')
-```
-
-### Sad Music?! (61)
-
-Earlier research showed that minor, slowness and low pitch in music gives us a sad feeling.
-
-![Results AOC](ResultsAO.jpg)
-
-***
-
-**Introduction**
-
-For this project I want to use the findings out of an earlier Musicology project. In my research on what makes music 'sad' I found that the minor aspect is the thing what makes music sad. Besides that aspect, also slowness and low pitch are important for giving a listener a sad feeling. My big goal for this portfolio project is to make a widget that measures how sad someone's playlist is by comparing these factors in a 3:2:1 ratio. This is based on the results, as you can see in the graph.  With these outcomes I want to make a day by day scheme for how 'sad' your day was according to the songs you listened that day. A calendar that shows your mood based on the music you listen ;). For now this is a too big goal, for this project my research question is 
-
-*'What is the mood of my own music, compared to most listenend pophits?*
-
-So my first step is to compare the major/minor- ratio and the mean tempo of my own playlist 'Most listened 2018' to 'Top 50 Nederland' playlist. I have not found a way yet to measure the pitch of the songs in the playlists, so for now I use the 'loudness' as extra indicator.
-
-**First Results**
-
-So far it seems that my own playlist is less sad than the Top 50 Nederland. Minor is 31% against 40% in Top 50 Nederland. My mean tempo is 120 BPM (sd= 31.7) against 116 BPM (sd= 24,0) For loudness the outcome for my most listened 2018 has a mean of -8,06 ; sd= 3,55. For Top50NL it has a mean of -6,64 with sd= 2,84.
-
-**Formula**
-
-I can make a formule to calculate the sadness (because of the different in numbers this formulate is not really accurate, but it is a sketch for futher steps).
-
-Sadness= 3mode -2(tempo/1000) -loudness/10.
-
-Sadness(Top50NL)= 3x0,40 - 2x0,116 + 0,664 = 1.632
-
-Sadness(My2018)= 3x0,31 - 2x0,120 + 0,806 = 1.976
-
-
-**Goals**
-
-My goal is to create a formule that which takes these aspects in a 3:2:1 ratio and is based on a 1 to 100 scale.
-
-Imported to keep in mind for the next weeks is that aspects as tempo and loudness are not well measured for songs with long silent intros, like You- The 1975. Those kind of songs are better left behind. While googling for these statistics I found out that Spotify has a correctness chance, this is something to use in the next weeks.
-
-I would also prefer to use Last.fm for my statistics, because I spend a big amount of my music listening on YouTube.
-
-
-
-### 'You listen to such depressing music!' (72)
-My own playlist (6,000 songs) comparement with a playlist of hits in all popgenres (10,000). 
-
-![This is a JPEG image due of the large amount of data](ComparementGraph.png)
-
-*** 
-
-**Comparement and variables**
-
-First of all, I decided to change the playlist I'm comparing. I have a playlist where I put in all the music I listen to. This playlist consist of almost 6,000 songs. I compare this playlist with a playlist that consists of 10.000, based on the most famous songs per genre. Good to notice is that this playlist is almost twice as big as my own playlist (10K versus 6K) It is hard to decide what kind of playlist is best fitting for my project. Because I'm comparing my own music to 'normal' music, I should have a playlist that consist of songs that are most listened, and known by the greatest amount of people.  
-
-Dr. Burgoyne told us in the last lecture that Energy and Valence are mostly used in music cognition for measuring emotion is music. This made me change my way of doing it in the research, so for now on I'll use energy, valence, mode, loudness and tempo as variables.The example visualisation dr. Burgoyne made for our lecture was luckily for me fitting for my portfolio!
-
-Based on what Dr. Burgoyne told in the lecture, for this research I will use: mode, tempo, loudness, energy and valence. Luckily for me, dr. Burgoyne already made a really good visualisation using these factors, so the only thing I had to do was chancing the visualisation to my own playlists. Besides I changed the way minor/minor was visualised in colors and added tempo to the alpha factor. 
- 
-**Conclusion**
-
-While the 10K playlist makes a clear line from the left bottum corner to the right top corner, my playlist really clusters at the left. There is a cluster at the left bottum corner, which would mean that my music is partly 'sad'.  There's also a cluster at the middle of the buttom of this graph, what would be an 'anger' cluster. 
-
-### 'Go down, soft sound' - Same song, different style, pitch? (83)
-The differences between the three versions of 'The 1975' by the band The 1975. 
-
-```{r}
-
-  The1975ABIIOR <- 
-    get_tidy_audio_analysis('7dvM0LbJ4pu1tDJnCH1Ahg') %>% 
-    select(segments) %>% unnest(segments) %>% 
-    select(start, duration, pitches)
-
-  The1975ILWYSYSBYSUOI <- 
-    get_tidy_audio_analysis('4LyEonRJ0clC020Yz3Qtk6') %>% 
-    select(segments) %>% unnest(segments) %>% 
-    select(start, duration, pitches)
-  
-  The1975 <- 
-    get_tidy_audio_analysis('2RWikgBoqBM5nu9GXPYNhq') %>% 
-    select(segments) %>% unnest(segments) %>% 
-    select(start, duration, pitches)
-  
-```
-
-```{r}
-#To make the graphic
-  The1975ABIIOR %>% 
-    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
-    compmus_gather_chroma %>% 
-    ggplot(
-      aes(
-        x = start + duration / 2, 
-        width = duration, 
-        y = pitch_class, 
-        fill = value
-        )) + 
-    geom_tile() +
-    labs(x = 'Time (s)', y = 'The 1975 ABIIOR', fill = 'Magnitude') +
-    theme_minimal()
-
-  The1975ILWYSYSBYSUOI %>% 
-    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
-    compmus_gather_chroma %>% 
-    ggplot(
-      aes(
-        x = start + duration / 2, 
-        width = duration, 
-        y = pitch_class, 
-        fill = value
-        )) + 
-    geom_tile() +
-    labs(x = 'Time (s)', y = 'The 1975 ILWYSYSBYSUOI', fill = 'Magnitude') +
-    theme_minimal() 
-   
-  
- The1975 %>% 
-    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
-    compmus_gather_chroma %>% 
-    ggplot(
-      aes(
-        x = start + duration / 2, 
-        width = duration, 
-        y = pitch_class, 
-        fill = value
-        )) + 
-    geom_tile() +
-    labs(x = 'Time (s)', y ='The 1975 The 1975', fill = 'Magnitude') +
-    theme_minimal()
-```
-
-
-*** 
-
-**Case Study: The 1975**
-
-One thing is clear, my all time favorite artist is the British band The 1975. To go a bit deeper into the music I listen to, I take my favourite band as a case study for the next analyse technique. I can give a whole TedTalk why this is the best band ever, but I will give you one reason in this project.
-Every album, they start off with the same song, 'The 1975'. Same lyrics, but different in style. As a prelude, the band introduces the style of the album with this song. But how much do these versions actually differ? Time to use the track analysis. 
-
-**Conclusion**
-As you can see there's a little difference in the pitches that are used in the three songs. Clear to see that the most recent version has repeated sequences. The second one has longer sequences, what is more used in an electronic style. And  the fist one, has the most build up sequence. 
-
-### 'You're intertwining your soul with somebody else'- Comparement between versions (83)
-Self-similarity of the normal and alt version of 'Somebody Else' by the band 'The 1975'. 
-
-```{r}
-SomebodyElseNormal <- 
-    get_tidy_audio_analysis('4m0q0xQ2BNl9SCAGKyfiGZ') %>%
-    select(segments) %>% unnest(segments) %>% 
-    select(start, duration, pitches)
-SomebodyElseAlt <- 
-    get_tidy_audio_analysis('4SbbujQwsJZozLjbix7QZ2') %>% 
-    select(segments) %>% unnest(segments) %>% 
-    select(start, duration, pitches)
+library(protoclust)
+library(plotly)
+library(heatmaply)
+library(ggdendro)
+library(protoclust)
+library(cluster)
 
 ```
 
+Music and Emotions
+=============================================
+
+
+Column {.tabset}
+--------------------------------------
+### **Introduction**
+Due Social Media and her memes we all know some famous songs that are played when a sad scenerio is visualised. But what do these songs have in common that they're associated with a 'sad' feeling? This was my research question in earlier Musicology research. I focused on three aspects of music: pitch, tempo and mode. The results showed that a minor mode, slow tempo and low pitch gives music a 'sad' association, in a 3:2:1 ratio. The violinbargraph is shown under the 'Violin Bar Graph'.
+
+Knowing that, I want to expend my research on sad music. 'You listen to such depressin music!', is something I hear a lot. Once again, what does make my music more sad than others? To compare to others, I'll take popmusic as a comparement, because that is the genre that most listened by the mainstream human being in our society. The main question I try to answer with this project is: **Is my own music taste more sad than the most listened pophits?**
+
+For answering this question I will make use of Spotify. Their playlist are very usefull, some are labeled with a mood. For this research, 'Happy Tunes' and 'Sad Songs' are used to find out what the makers of these list see as happy and as sad. Besides, for the main comparement is the playlist 'BIGGEST HITS OF ALL TIME' used, consisting of 10k popsongs. This one is comparement with the biggest playlist of my own, 'Watvoor muzieksmaak heb je?', consisting of 6k of songs I listen to reguraly. 
+
+### Violin Bar Graph
+
+![ResultsAO](ResultsAO.jpg)
+
+Column {.tabset}
+-----------------------
+
+### Meme 
+
+![SadMusicMeme](SadMusicMeme.jpg)
+
+
+
+Approaches to sadness
+====================
+
+Row 
+----------------------------
+
+### Material and method
+**1)**First of all, I will see how my own variables **Mode, pitch and tempo** consist in the the Happy and the Sad playlist. Sadly, pitch is not a variable within the Spotify API, so I'll use loudness as an extra variable. Moreover, in this section I also make use of the twelve timbre features of Spotify to compare the 'colorness' of a Sad and a Happy playlist. 
+
+---  *As you can see in this graph, the blue dots (meaning minor) are in the left corner, meaning that the tempo on average and the change within a song is the same: both relatively slow. This is in line with my earlier finding: slow and minor are both aspects of 'Sad' music. In the timbre comparement graph is clear to see that the timbre features differ among the playlists. Mostly, the sad playlist has a lower value on the feature, but as you can see at feature 5, (C05), it is higher than by the Happy playlist.*  
+
+
+**2)**Secondly, in **cognitive musicology**, mood of music is shaped by *Valence and Energy* . Low valence and low energy is seen as sad music. In this graph I added, once again, the mode in color,the tempo in alpha and the loudness in size.  
+
+
+---  *As you can see in the graph, this approach is true by the Happy and Sad playlist of Spotify! Moreover, the whole Sad playlist is in under 0.5 in his valence value and mostly under 0,5 in energy. The Happy playlist however, does not have that clear distinction. It is mostly in the top right, meaning high energy and high valence. Some songs of this playlist, who also have a slow tempo, are more to the left corner.* 
+
+
+**3)**But what does **Spotify** use? The open this black box, I make us of a clustering function. In the dendogram I compare the playlists within themselves to see what Spotify sees as the songs who have the most in common. Secondly I use a heatmaply to see on feature which aspects exactly holds these songs together
+
+--- *Sadly, it seems unable to bring out a clear classification within both playlists. The heatmap works for Happy only. So based on the black box of Spotify will keep closed. *
+
+**All together:**
+As you can clearly see out of these graphs, is that Happy Tunes have a high energy and valence level. Sad songs however, have a low energy, low loudness and a lower tempo than the happy tunes. Clear to see that, also in music,  *Sadness comes when everything is gone* . Suprising in both the first and the second tab of graphs is that the minor songs noticable times have higher tempo, valence and energie than the the major mode songs. Seeing this, I personally think of emo/punk songs who are quite dramatic and are reaching for a sad climax. 
+
+
+---  *Based on this approaches, we can say that sad music (as a playlist) is shaped alow tempo, low energy, low valence and low loudness.*
+
+
+Column {.tabset}
+--------------------------------
+### **1) Mode, Pitch and tempo**
 ```{r}
-compmus_long_distance(
-    SomebodyElseNormal %>% mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')),
-    SomebodyElseAlt %>% mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')),
-    feature = pitches,
-    method = 'euclidean') %>% 
+SadSongs<-
+    get_playlist_audio_features(
+        'spotify', '37i9dQZF1DX7qK8ma5wgG1') %>% 
+          add_audio_analysis()
+
+HappyTunes<-
+    get_playlist_audio_features(
+        'spotify','37i9dQZF1DX9u7XXOp0l5L') %>% 
+          slice(1:60) %>%
+         add_audio_analysis()
+
+Comparement <-
+  SadSongs %>% mutate(playlist = "Sad") %>%
+    bind_rows(HappyTunes %>% mutate(playlist = "Happy"))
+
+Comparement %>% 
+    mutate(
+        sections = 
+            map(
+                sections, 
+                summarise_at, 
+                vars(tempo, loudness, duration), 
+                list(section_mean = mean, section_sd = sd))) %>% 
+    unnest(sections) %>%
     ggplot(
         aes(
-            x = xstart + xduration / 2, 
-            width = xduration,
-            y = ystart + yduration / 2,
-            height = yduration,
-            fill = d)) + 
-    geom_tile() +
-    scale_fill_continuous(type = 'viridis', guide = "none") +
-    labs(x = 'SomebodyElseNormal', y = 'SomebodyElseAlt') +
-    theme_minimal()
+            x = tempo, 
+            y = tempo_section_sd, 
+            colour = mode, 
+            alpha = loudness,
+            fill = mode
+            )) +
+    geom_point(aes(shape= playlist, size= duration)) + 
+    geom_rug() + 
+    theme_minimal() +
+    ylim(0, 5) + 
+    labs(
+        x = 'Mean Tempo (bpm)', 
+        y = 'SD Tempo', 
+        colour = 'Mood',
+        shape = 'Mood', 
+        alpha = 'Loudness',
+        size =  'Duration') 
+
+
+
+Comparement%>% 
+    mutate(
+        timbre =
+            map(
+                segments,
+                compmus_summarise,
+                timbre,
+                method = 'mean')) %>%
+    select(playlist, timbre) %>% 
+    compmus_gather_timbre %>% 
+    ggplot(aes(x = basis, y = value, fill = playlist)) +
+    geom_violin() +
+    theme_minimal() +
+    scale_fill_viridis_d() +
+    labs(x = 'Spotify Timbre Coefficients', y = '', fill = 'Playlist')
+
+``` 
+
+### **2) Cognitive Musicology**
+````{r}
+
+# Combine data sets with a labelling variable
+
+CognComparement <-
+ HappyTunes%>% mutate(playlist = "Happy") %>%
+  bind_rows(SadSongs %>% mutate(playlist = "Sad"))
+
+# Code by Ashley -> my research
+
+CognComparement %>%                       # Start with awards.
+  ggplot(                      # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = loudness,            #Let op: tempo ipv loudness
+      colour = mode,
+      alpha= tempo,
+    )
+  )+
+  geom_point() +               # Scatter plot.
+  geom_rug(size = 0.1) +       # Add 'fringes' to show data distribution.
+  facet_wrap(~ playlist) +     # Separate charts per playlist.
+  scale_x_continuous(          # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),  # Use grid-lines for quadrants only.
+    minor_breaks = NULL      # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(          # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(         # Use the Color Brewer to choose a palette.
+    type = "qual",           # Qualitative set.
+    palette = "Set1"       # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(       # Fine-tune the sizes of each point.
+    trans = "exp",           # Use an exp transformation to emphasise loud.
+    guide = "none"           # Remove the legend for size.
+  ) +
+  theme_light() +              # Use a simpler them.
+  labs(                        # Make the titles nice.
+    x = "Valence",
+    y = "Energy",
+    colour = "Mode",
+    size = "Loudness",
+    alpha = "Tempo"
+  )
 ```
 
-*** 
-**Alt versus normal version - Long distance comparement**
-My most listened song of The 1975 is 'Somebody Else'. This song has two versions, a normal and an 'Alt' version. In my opinion, the  versions do not differ so much, by ear. Let's use this analysis to see whether I am right or not!
+### **3) Clustering / Dendogram**
+```{r}
+HappyClust <- 
+    get_playlist_audio_features('spotify','37i9dQZF1DX9u7XXOp0l5L') %>% 
+    slice(1:10) %>% 
+    add_audio_analysis %>% 
+    mutate(
+        segments = 
+            map2(segments, key, compmus_c_transpose)) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches,  
+                method = 'mean', norm = 'manhattan'),
+        timbre =
+            map(
+                segments,
+                compmus_summarise, timbre,
+                method = 'mean')) %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
+    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
+    unnest(pitches, timbre)
 
-**Conclusion**
-Somebody Else seems only to differ in the bridge part of the song, but in the rest of the song, the song is mostly the same. 
+SadClust <-
+      get_playlist_audio_features('spotify','37i9dQZF1DX7qK8ma5wgG1') %>% 
+    slice(1:10) %>% 
+    add_audio_analysis %>% 
+    mutate(
+        segments = 
+            map2(segments, key, compmus_c_transpose)) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'),
+        timbre =
+            map(
+                segments,
+                compmus_summarise, timbre,
+                method = 'mean')) %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
+    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
+    unnest(pitches, timbre)
 
-### The 'Colorness' of PopMusic - Timbre and Chroma (94)
+HappyClust_juice <- 
+    recipe(track_name ~
+               danceability +
+               energy +
+               loudness +
+               speechiness +
+               acousticness +
+               instrumentalness +
+               liveness +
+               valence +
+               tempo +
+               duration_ms +
+               C + `C#|Db` + D + `D#|Eb` +
+               E + `F` + `F#|Gb` + G +
+               `G#|Ab` + A + `A#|Bb` + B +
+               c01 + c02 + c03 + c04 + c05 + c06 +
+               c07 + c08 + c09 + c10 + c11 + c12,
+           data = HappyClust) %>% 
+    step_center(all_predictors()) %>%
+    step_scale(all_predictors()) %>%
+    # step_range(all_predictors()) %>% 
+    prep(HappyClust%>% mutate(track_name = str_trunc(track_name, 20))) %>% 
+    juice %>% 
+    column_to_rownames('track_name')
 
-***
+SadClust_juice <- 
+    recipe(track_name ~
+               danceability +
+               energy +
+               loudness +
+               speechiness +
+               acousticness +
+               instrumentalness +
+               liveness +
+               valence +
+               tempo +
+               duration_ms +
+               C + `C#|Db` + D + `D#|Eb` +
+               E + `F` + `F#|Gb` + G +
+               `G#|Ab` + A + `A#|Bb` + B +
+               c01 + c02 + c03 + c04 + c05 + c06 +
+               c07 + c08 + c09 + c10 + c11 + c12,
+           data = SadClust) %>% 
+    step_center(all_predictors()) %>%
+    step_scale(all_predictors()) %>%
+    # step_range(all_predictors()) %>% 
+    prep(SadClust%>% mutate(track_name = str_trunc(track_name, 20))) %>% 
+    juice %>% 
+    column_to_rownames('track_name')
+```
 
-**Style differences**
+###**3) Clustering / Heatmap**
+```{r}
 
-Another key charastic of The 1975 is their use of different styles between songs. My favourite song, 'Robbers' is quite a pop song. Their most famous song, 'Chocolate' is one of the most 'wannabe boyband popsong of the '10's' you could think of. However 'Please Be Naked' is a completely instrumental, in a piano/electronic way. 
+grDevices::dev.size("px")
 
-**Conclusion**
+heatmaply(
+    HappyClust_juice,
+    hclustfun = hclust,
+    # hclustfun = protoclust,
+    # Comment out the hclust_method line when using protoclust.
+    hclust_method = 'average',
+    dist_method = 'euclidean')
+```
 
-As you can see out of the plots, the most colorfull one in all 12 sections is the instrumental 'Please Be Naked'. 'Chocolate' is almost completely blue and 'Robbers' has a little yellow, meaning that the more 'poppy' a song is, the less color in the timbre  sections has. 
+```{r} 
+heatmaply(
+    SadClust_juice,
+    hclustfun = hclust,
+    # hclustfun = protoclust,
+    # Comment out the hclust_method line when using protoclust.
+    hclust_method = 'average', 
+    dist_method = 'euclidean')
 
-### The Segmentation of PopMusic (105)
+```
+
+
+Song to Song comparement
+==============================
+
+Column {.tabset}
+----------------------------
+###Case Study
+Knowing what music as a whole makes sad, it is time to find out what music as a song makes sad. In this part I can finally use my 'pitch' variable from earlier research! As a case study I have chosen two songs who were recenlty hits and are associatable with the moods I'm describing. For the happy category I have chosen 'Happy' by Pharrell Williams, cause 'clap along if you feel like happiness is the truth'. For my sad category I make use of 'Say Something' by A Great Big World & Christina Aguilera.
+
+**1)**By using **chromagrams** we are able to see with tones we hear while listening to so the song. 
+
+---  *In the chromogram of 'Happy' we see that the most used tone is F in combination with c#. The tones change fast, meaning that a lot of notes are used to make this song. In 'Say Something' however, the tones do not change as much as in the 'Happy' song. The most used tone is clearly D, followed by A and that is mostly it. *
+
+**2)**In these graphs we can see which chords are used, so we can detect the harmony. 
+
+---*In 'Happy' we see yellow in the major, like D major, B major and E major. This would mean that they are least in the song. This is weird.  We also see phrases in the song, the song seems to have 9 parts. This is in line with earlier finding that happy music has more change in it. In the 'Say Something' graph we see no clear distinction in chords used, only the D major chord is clear darker than the others. There are seven phrares to see, but less clear than by 'Happy'.* 
+
+**3)** To move futher on the speed of a song we look at **tempo and beats**. In this section we have a closer look at how tempo behaves in these two songs. For this we only use 30 seconds of the song, to have a clear close look. As we already have seen in the pitch and chord tabs, the 'Happy' song chances more than the 'Say Something' song. Can we also see this pattern in tempo related ways? For answering this I make use of three kinds of measuring: 
+
+a. Novelty function (to see how new a beat is), 
+b. beat detenction based on the tones and 
+c. the change in the 12 timbre functions of Spotify.
+
+--- *Looking at 'Happy' by Pharrell we see in the novelty function that there are a lot of peaks, sharp and around 15. In the pitch based tempogram we see the same pattern as in the chromagram, fast changes over all the twelves tones. In the timbre based tempogram we see, suprising, the same. The first feature is stable, so the loudness does not change. the second and the third however, change over time, in a fast way. In the novelty function of 'Say Something' we see peaks with much width, and way less than by 'Happy'. In the end of this 30 seconds fragment, we see a big one, meaning that there is a new beat incoming. In the tempogram based on pitch we slower pattern, as we expected from the chromagrams. Same for the timbrefeatures, it seems that this sad song does not change in his timbre.* 
+
+
+Column {.tabset}
+--------------------------------
+
+### **1) Pitch in Chromagrams**
+ 
+ 
+ 
+```{r}
+  HappyPharell <- 
+    get_tidy_audio_analysis('6NPVjNh8Jhru9xOmyQigds') %>% 
+    select(segments) %>% unnest(segments) %>% 
+    select(start, duration, pitches)
+
+  SaySomething <- 
+    get_tidy_audio_analysis('6Vc5wAMmXdKIAM7WUoEb7N') %>% 
+    select(segments) %>% unnest(segments) %>% 
+    select(start, duration, pitches)
+
+HappyPharell %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
+    compmus_gather_chroma %>% 
+    ggplot(
+      aes(
+        x = start + duration / 2, 
+        width = duration, 
+        y = pitch_class, 
+        fill = value
+        )) + 
+    geom_tile() +
+    labs(x = 'Time (s)', y = 'Happy', fill = 'Magnitude') +
+    theme_minimal()
+
+
+SaySomething %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'chebyshev')) %>% 
+    compmus_gather_chroma %>% 
+    ggplot(
+      aes(
+        x = start + duration / 2, 
+        width = duration, 
+        y = pitch_class, 
+        fill = value
+        )) + 
+    geom_tile() +
+    labs(x = 'Time (s)', y = 'Say Something', fill = 'Magnitude') +
+    theme_minimal()
+```
 ```{r}
 
 circshift <- function(v, n) {if (n == 0) v else c(tail(v, n), head(v, -n))}
@@ -255,521 +447,341 @@ key_templates <-
         'D#:min', circshift(minor_key,  3))
 
 
-Robbers<- 
-    get_tidy_audio_analysis('73jVPicY2G9YHmzgjk69ae') %>% 
-    compmus_align(sections, segments) %>% 
-    select(sections) %>% unnest(sections) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'))
-RobbersPlot<-
-    Robbers%>%
-    compmus_match_pitch_template(key_templates, 'aitchison', 'manhattan')%>% 
-    ggplot(
-        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E') +
-    theme_minimal() +
-    labs(x = 'Time (s)', y = 'Robbers', fill = 'Distance')
-
-ggplotly(RobbersPlot)
-
-PleaseBeNaked<- 
-    get_tidy_audio_analysis('7jS5cQ5GuGkPPdIoUUct0P') %>% 
-    compmus_align(sections, segments) %>% 
-    select(sections) %>% unnest(sections) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'))
-PleaseBeNakedPlot<-
-    PleaseBeNaked %>% 
-    compmus_match_pitch_template(key_templates, 'aitchison', 'manhattan')%>% 
-    ggplot(
-        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E') +
-    theme_minimal() +
-    labs(x = 'Time (s)', y = 'PleaseBeNaked', fill = 'Distance')
-
-ggplotly(PleaseBeNakedPlot)
-
-Chocolate<- 
-    get_tidy_audio_analysis('0KivRxhyT9xMen2cs3rJD3')%>% 
-    compmus_align(sections, segments) %>% 
-    select(sections) %>% unnest(sections) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'))
-ChocolatePlot<-
-    Chocolate %>% 
-    compmus_match_pitch_template(key_templates, 'aitchison', 'manhattan')%>% 
-    ggplot(
-        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E') +
-    theme_minimal() +
-    labs(x = 'Time (s)', y = 'Chocolate', fill = 'Distance')
-
-ggplotly(ChocolatePlot)
 ```
 
 
+### **2) Harmony in chordograms**
 
-***
-
-**Style differences**
-
-Using the same three songs of previous plot, you can also see that the popsongs have a clear bridge convention. This means that the song is verse-chorus-verse-BRIDGE-chorus. The 'Please Be Naked' song, however, has a clear segmentations in it, which means that there are way more sections within the song.There is even no verse, chorus or bridge. There is a repeated segment at the end, and that is it.
-
-### Tonal Analysis
-```{r}
-Robbers %>% 
-    compmus_match_pitch_template(key_templates, 'euclidean', 'manhattan') %>% 
-    ggplot(
-        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    theme_minimal() +
-    labs(x = 'Time (s)', y = '')
-
-Chocolate %>% 
-    compmus_match_pitch_template(key_templates, 'euclidean', 'manhattan') %>% 
-    ggplot(
-        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    theme_minimal() +
-    labs(x = 'Time (s)', y = '')
-
-PleaseBeNaked %>% 
-    compmus_match_pitch_template(key_templates, 'euclidean', 'manhattan') %>% 
-    ggplot(
-        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
-    geom_tile() +
-    scale_fill_viridis_c(option = 'E', guide = 'none') +
-    theme_minimal() +
-    labs(x = 'Time (s)', y = '')
-``` 
-*** 
-
-In the comparement of tonal analysis you can see that they are mostly the same. All blue graphs. 
-### Low level features (116)
 
 ```{r}
-Mijn<-
-    get_playlist_audio_features(
-        '11122548577','76MRLl4f6AvyYCrvs7X11P') %>% 
-    slice(1:100) %>% 
-    add_audio_analysis()
+HappyPharell2<- 
+    get_tidy_audio_analysis('6NPVjNh8Jhru9xOmyQigds') %>% 
+    compmus_align(sections, segments) %>% 
+    select(sections) %>% unnest(sections) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'))
 
-Thousand<-
-    get_playlist_audio_features(
-        'thedoctorkto','54nv8jbrm4JoHEZ49Qvjgl') %>% 
-    slice(1:100) %>% 
-    add_audio_analysis()
+SaySomething2<- 
+    get_tidy_audio_analysis('6Vc5wAMmXdKIAM7WUoEb7N') %>% 
+    compmus_align(sections, segments) %>% 
+    select(sections) %>% unnest(sections) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'))
 
-Comparement <-
-    Mijn %>% mutate(playlist = "Mijn") %>%
-    bind_rows(Thousand %>% mutate(playlist = "Thousand"))
+
+HappyPharell2 %>% 
+    compmus_match_pitch_template(key_templates, 'euclidean', 'manhattan') %>% 
+    ggplot(
+        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    theme_minimal() +
+    labs(x = 'Time (s)', y = 'Happy')
+
+SaySomething2 %>% 
+    compmus_match_pitch_template(key_templates, 'euclidean', 'manhattan') %>% 
+    ggplot(
+        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    theme_minimal() +
+    labs(x = 'Time (s)', y = 'Say Something')
+
 ```
 
 
 ```{r}
-Comparement %>% 
+HappyPharell3 <- 
+    get_tidy_audio_analysis('6NPVjNh8Jhru9xOmyQigds') %>% 
+    compmus_align(bars, segments) %>% 
+    select(bars) %>% unnest(bars) %>% 
     mutate(
-        sections = 
-            map(
-                sections, 
-                summarise_at, 
-                vars(tempo, loudness, duration), 
-                list(section_mean = mean, section_sd = sd))) %>% 
-    unnest(sections) %>%
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'acentre', norm = 'manhattan')) %>% 
+    mutate(
+        timbre = 
+            map(segments, 
+                compmus_summarise, timbre, 
+                method = 'mean'))
+
+```
+
+
+### **3) Tempo in tempogram**
+
+
+
+```{r}
+HappyPharell3plot <- 
+    bind_rows(
+        HappyPharell3 %>% compmus_self_similarity(pitches, 'aitchison') %>% mutate(d = d / max(d), type = "Chroma"),
+        HappyPharell3 %>% compmus_self_similarity(timbre, 'euclidean') %>% mutate(d = d / max(d), type = "Timbre")) %>% 
     ggplot(
         aes(
-            x = tempo, 
-            y = tempo_section_sd, 
-            colour = playlist, 
-            alpha = loudness)) +
-    geom_point(aes(size = duration / 60)) + 
-    geom_rug() + 
-    theme_minimal() +
-    ylim(0, 5) + 
-    labs(
-        x = 'Mean Tempo (bpm)', 
-        y = 'SD Tempo', 
-        colour = 'Genre', 
-        size = 'Duration (min)', 
-        alpha = 'Volume (dBFS)')
+            x = xstart + xduration / 2, 
+            width = xduration,
+            y = ystart + yduration / 2,
+            height = yduration,
+            fill = d)) + 
+    geom_tile() +
+    coord_fixed() +
+    facet_wrap(~ type) +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    theme_classic() +
+    labs(x = '', y = 'Happy')
 
-Comparement%>% 
+SaySomething3 <- 
+    get_tidy_audio_analysis('6Vc5wAMmXdKIAM7WUoEb7N') %>% 
+    compmus_align(bars, segments) %>% 
+    select(bars) %>% unnest(bars) %>% 
     mutate(
-        timbre =
-            map(
-                segments,
-                compmus_summarise,
-                timbre,
-                method = 'mean')) %>%
-    select(playlist, timbre) %>% 
-    compmus_gather_timbre %>% 
-    ggplot(aes(x = basis, y = value, fill = playlist)) +
-    geom_violin() +
-    scale_fill_viridis_d() +
-    labs(x = 'Spotify Timbre Coefficients', y = '', fill = 'Playlist')
-```
-*** 
-These low level features show once again that my own playlist is quite different from the pop playlist. 
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'acentre', norm = 'manhattan')) %>% 
+    mutate(
+        timbre = 
+            map(segments, 
+                compmus_summarise, timbre, 
+                method = 'mean'))
 
-
-
-***
-Once again, these low level features show that my playlist is quite different from the popplaylist. 
-
-###Classification (127)
-
-```{r}
-SadSongs<- 
-    get_playlist_audio_features('spotify', '37i9dQZF1DX7qK8ma5wgG1') %>% 
-    slice(1:20) %>% 
-    add_audio_analysis
-HappyTunes <- 
-    get_playlist_audio_features('spotify', '37i9dQZF1DX9u7XXOp0l5L') %>% 
-    slice(1:20) %>% 
-    add_audio_analysis
-Mar19 <- 
-    get_playlist_audio_features('11122548577', '6eEo9NEapZSsUPlE7ZSjvU') %>% 
-    slice(1:20) %>% 
-    add_audio_analysis
-```
-
-
-```{r}
-Comparement6 <- 
-    SadSongs %>% mutate(playlist = "Sad Songs") %>% 
+SaySomething3plot <- 
     bind_rows(
-        HappyTunes %>% mutate(playlist = "Happy Tunes"),
-        Mar19 %>% mutate(playlist = "Mar19")) %>% 
-    mutate(playlist = factor(playlist)) %>% 
-    mutate(
-        segments = 
-            map2(segments, key, compmus_c_transpose)) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'),
-        timbre =
-            map(
-                segments,
-                compmus_summarise, timbre,
-                method = 'mean')) %>% 
+        SaySomething3 %>% compmus_self_similarity(pitches, 'aitchison') %>% mutate(d = d / max(d), type = "Chroma"),
+        SaySomething3 %>% compmus_self_similarity(timbre, 'euclidean') %>% mutate(d = d / max(d), type = "Timbre")) %>% 
+    ggplot(
+        aes(
+            x = xstart + xduration / 2, 
+            width = xduration,
+            y = ystart + yduration / 2,
+            height = yduration,
+            fill = d)) + 
+    geom_tile() +
+    coord_fixed() +
+    facet_wrap(~ type) +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    theme_classic() +
+    labs(x = '', y = 'Say Something')
+
+```
+
+
+```{r}
+HappyPharell4 <- 
+    get_tidy_audio_analysis('6NPVjNh8Jhru9xOmyQigds') %>% 
+    select(segments) %>% unnest(segments)
+
+HappyPharell4 %>% 
+    mutate(loudness_max_time = start + loudness_max_time) %>% 
+    arrange(loudness_max_time) %>% 
+    mutate(delta_loudness = loudness_max - lag(loudness_max)) %>% 
+    ggplot(aes(x = loudness_max_time, y = pmax(0, delta_loudness))) +
+    geom_line() +
+    xlim(0, 30) +
+    theme_minimal() +
+    labs(x = 'Time (s)', y = 'Novelty')
+
+HappyPharell4 %>% 
     mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
-    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
-    unnest(pitches, timbre)
-```
+    arrange(start) %>% 
+    mutate(pitches = map2(pitches, lag(pitches), `-`)) %>% 
+    compmus_gather_chroma %>% 
+    ggplot(
+        aes(
+            x = start + duration / 2, 
+            width = duration, 
+            y = pitch_class, 
+            fill = pmax(0, value))) + 
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    xlim(0, 30) +
+    labs(x = 'Time (s)', y = 'Happy', fill = 'Magnitude') +
+    theme_classic()
 
+HappyPharell4%>% 
+    arrange(start) %>% 
+    mutate(timbre = map2(timbre, lag(timbre), `-`)) %>% 
+    compmus_gather_timbre %>% 
+    ggplot(
+        aes(
+            x = start + duration / 2, 
+            width = duration, 
+            y = basis, 
+            fill = pmax(0, value))) + 
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    xlim(0, 30) +
+    labs(x = 'Time (s)', y = 'Happy', fill = 'Magnitude') +
+    theme_classic()
 
-```{r}
-Comparement6_class <- 
-    recipe(playlist ~
-               danceability +
-               energy +
-               loudness +
-               speechiness +
-               acousticness +
-               instrumentalness +
-               liveness +
-               valence +
-               tempo +
-               duration_ms +
-               C + `C#|Db` + D + `D#|Eb` +
-               E + `F` + `F#|Gb` + G +
-               `G#|Ab` + A + `A#|Bb` + B +
-               c01 + c02 + c03 + c04 + c05 + c06 +
-               c07 + c08 + c09 + c10 + c11 + c12,
-           data = Comparement6) %>% 
-    step_center(all_predictors()) %>%
-    step_scale(all_predictors()) %>%
-    # step_range(all_predictors()) %>% 
-    prep(Comparement6) %>% 
-    juice
-```
+SaySomething4 <- 
+    get_tidy_audio_analysis('6Vc5wAMmXdKIAM7WUoEb7N') %>% 
+    select(segments) %>% unnest(segments)
 
+SaySomething4 %>% 
+    mutate(loudness_max_time = start + loudness_max_time) %>% 
+    arrange(loudness_max_time) %>% 
+    mutate(delta_loudness = loudness_max - lag(loudness_max)) %>% 
+    ggplot(aes(x = loudness_max_time, y = pmax(0, delta_loudness))) +
+    geom_line() +
+    xlim(0, 30) +
+    theme_minimal() +
+    labs(x = 'Time (s)', y = 'Novelty')
 
-```{r}
-Comparement6_cv <- Comparement6_class %>% vfold_cv(5)
-```
-```{r}
-Comparement6_knn <- nearest_neighbor(neighbors = 1) %>% set_engine('kknn')
-predict_knn <- function(split)
-    fit(Comparement6_knn, playlist ~ ., data = analysis(split)) %>% 
-    predict(assessment(split), type = 'class') %>%
-    bind_cols(assessment(split))
-```
-
-
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
-    conf_mat(truth = playlist, estimate = .pred_class)
-```
-
-
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
-    conf_mat(truth = playlist, estimate = .pred_class) %>% 
-    autoplot(type = 'mosaic')
-```
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
-    conf_mat(truth = playlist, estimate = .pred_class) %>% 
-    autoplot(type = 'heatmap')
-```
-
-
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_knn)) %>% unnest(pred) %>% 
-    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
-```
-
-
-```{r}
-Comparement6_logistic <- logistic_reg() %>% set_engine('glm')
-predict_logistic <- function(split)
-    fit(indie_logistic, playlist ~ ., data = analysis(split)) %>% 
-    predict(assessment(split), type = 'class') %>%
-    bind_cols(assessment(split))
-```
-
-
-```{r}
-Comparement6_multinom <- multinom_reg(penalty = 0.1) %>% set_engine('glmnet')
-predict_multinom <- function(split)
-    fit(Comparement6_multinom, playlist ~ ., data = analysis(split)) %>% 
-    predict(assessment(split), type = 'class') %>%
-    bind_cols(assessment(split))
-```
-
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_multinom)) %>% unnest(pred) %>% 
-    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
-```
-
-
-```{r}
-Comparement6_class %>% 
-    fit(Comparement6_multinom, playlist ~ ., data = .) %>% 
-    pluck('fit') %>%
-    coef
-```
-
-
-```{r}
-Comparement6_tree <- decision_tree() %>% set_engine('C5.0')
-predict_tree <- function(split)
-    fit(Comparement6_tree, playlist ~ ., data = analysis(split)) %>% 
-    predict(assessment(split), type = 'class') %>%
-    bind_cols(assessment(split))
-```
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_tree)) %>% unnest(pred) %>% 
-    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
-```
-
-
-```{r}
-Comparement6_class %>% 
-    fit(Comparement6_tree, playlist ~ ., data = .) %>% 
-    pluck('fit') %>%
-    summary
-```
-
-
-```{r}
-Comparement6_forest <- rand_forest() %>% set_engine('randomForest')
-predict_forest <- function(split)
-    fit(Comparement6_forest, playlist ~ ., data = analysis(split)) %>% 
-    predict(assessment(split), type = 'class') %>%
-    bind_cols(assessment(split))
-```
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_forest)) %>% 
-    unnest(pred) %>% 
-    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
-```
-
-```{r}
-Comparement6_class <- 
-    recipe(playlist ~
-               danceability +
-               energy +
-               loudness +
-               speechiness +
-               acousticness +
-               instrumentalness +
-               liveness +
-               valence +
-               tempo +
-               duration_ms +
-               C + `C#|Db` + D + `D#|Eb` +
-               E + `F` + `F#|Gb` + G +
-               `G#|Ab` + A + `A#|Bb` + B +
-               c01 + c02 + c03 + c04 + c05 + c06 +
-               c07 + c08 + c09 + c10 + c11 + c12,
-           data = Comparement6) %>% 
-    step_center(all_predictors()) %>%
-    step_scale(all_predictors()) %>%
-    # step_range(all_predictors()) %>% 
-    prep(Comparement6) %>% 
-    juice
-``` 
-
-```{r}
-Comparement6_class %>% 
-    fit(Comparement6_forest, playlist ~ ., data = .) %>% 
-    pluck('fit') %>% 
-    randomForest::varImpPlot()
-```
-
-
-```{r}
-predict_knn_reduced <- function(split)
-    fit(
-        Comparement6_knn, 
-        playlist ~ c01 + c11 + liveness + energy + acousticness, 
-        data = analysis(split)) %>% 
-    predict(assessment(split), type = 'class') %>%
-    bind_cols(assessment(split))
-
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_knn_reduced)) %>% unnest(pred) %>% 
-    metric_set(accuracy, kap, j_index)(truth = playlist, estimate = .pred_class)
-```
-
-```{r}
-Comparement6_cv %>% 
-    mutate(pred = map(splits, predict_knn_reduced)) %>% unnest(pred) %>% 
-    conf_mat(truth = playlist, estimate = .pred_class) %>% 
-    autoplot(type = 'mosaic')
-```
-
-
-```{r}
-Comparement6 %>%
-    ggplot(aes(x = c01, y = c11, colour = playlist, size = liveness)) +
-    geom_point(alpha = 0.8) +
-    scale_color_brewer(type = 'qual', palette = 'Accent') +
-    labs(x = 'Timbre Component 1', y = 'Timbre Component 11', size = 'Liveness', colour = 'Playlist')
-```
-
-
-
-***
-**Heartbeat**
-The song Please Be Naked is charastic for the use of a heartbeat is prominent beat. The closer to the end of the song, the louder the heartbeat is. 
-
-###Clustering
-```{r}
-HappyxSad<- 
-    get_playlist_audio_features('11122548577','1C15xY2yKcbmOU7xzNwFlJ') %>% 
-    add_audio_analysis %>% 
-    mutate(
-        segments = 
-            map2(segments, key, compmus_c_transpose)) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'),
-        timbre =
-            map(
-                segments,
-                compmus_summarise, timbre,
-                method = 'mean')) %>% 
+SaySomething4 %>% 
     mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
-    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
-    unnest(pitches, timbre)
+    arrange(start) %>% 
+    mutate(pitches = map2(pitches, lag(pitches), `-`)) %>% 
+    compmus_gather_chroma %>% 
+    ggplot(
+        aes(
+            x = start + duration / 2, 
+            width = duration, 
+            y = pitch_class, 
+            fill = pmax(0, value))) + 
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    xlim(0, 30) +
+    labs(x = 'Time (s)', y = 'Say Something', fill = 'Magnitude') +
+    theme_classic()
+
+SaySomething4%>% 
+    arrange(start) %>% 
+    mutate(timbre = map2(timbre, lag(timbre), `-`)) %>% 
+    compmus_gather_timbre %>% 
+    ggplot(
+        aes(
+            x = start + duration / 2, 
+            width = duration, 
+            y = basis, 
+            fill = pmax(0, value))) + 
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    xlim(0, 30) +
+    labs(x = 'Time (s)', y = 'Say Something', fill = 'Magnitude') +
+    theme_classic()
 ```
 
-```{r}
-HappyxSad_juice <- 
-    recipe(track_name ~
-               danceability +
-               energy +
-               loudness +
-               speechiness +
-               acousticness +
-               instrumentalness +
-               liveness +
-               valence +
-               tempo +
-               duration_ms +
-               C + `C#|Db` + D + `D#|Eb` +
-               E + `F` + `F#|Gb` + G +
-               `G#|Ab` + A + `A#|Bb` + B +
-               c01 + c02 + c03 + c04 + c05 + c06 +
-               c07 + c08 + c09 + c10 + c11 + c12,
-           data = HappyxSad) %>% 
-    step_center(all_predictors()) %>%
-    step_scale(all_predictors()) %>%
-    # step_range(all_predictors()) %>% 
-    prep(HappyxSad %>% mutate(track_name = str_trunc(track_name, 20))) %>% 
-    juice %>% 
-    column_to_rownames('track_name')
+
+
+My Own vs Pop 
+======================================
+
+Column {.tabset}
+-------------------------
+###**Results**
+After having all these ways to approach 'Sadness' in music, it is time to compare my own playlist to popmusic. Because we are talking about music as a whole playlist, we have to fit with our measure variables. Out of the approaches I prefer the cognitive most, because that one gives the clearest distinction between the 'Happy Tunes' and 'Sad Songs' playlist. In this graph  I also included mode in the color, tempo in alpha and loudness in size. 
+
+--- *By using so many songs, we get an abstract painting as graph! While the popplaylist makes a line from the left corner to the right corner above with being a bit more to the left, my own playlist is way more to the left. My own music has a group in completely in the left corner, the pop one does not have this. There is also a cluster in the left corner above, low valence and high energy. This is associated with anger.  It seems that my own playlist has relatively more blue spots than red, compared to the pop one. This means that a bigger percentage is minor than in pop music. This is honestly hard to tell, due the amount of data.*
+
+Column {.tabset}
+----------------------------
+
+###**Putting all the variables together**
+````{r}
+
+
+# Download the playlists for the comparement
+
+Pop <- get_playlist_audio_features('thedoctorkto','54nv8jbrm4JoHEZ49Qvjgl') %>% slice(1:5000)
+Own<- get_playlist_audio_features('11122548577','76MRLl4f6AvyYCrvs7X11P') %>% slice(1:5000)
+
+# Combine data sets with a labelling variable
+
+Mood <-
+  Pop %>% slice(1:5000) %>% mutate(playlist = "Pop") %>%
+  bind_rows( Own %>% slice(1:5000) %>% mutate(playlist = "Own"))
+
+# Code by Ashley -> my research
+
+Mood %>%                       # Start with awards.
+  ggplot(                      # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = loudness,            #Let op: tempo ipv loudness
+      colour = mode,
+      alpha= tempo,
+    )
+  )+
+  geom_point() +               # Scatter plot.
+  geom_rug(size = 0.1) +       # Add 'fringes' to show data distribution.
+  facet_wrap(~ playlist) +     # Separate charts per playlist.
+  scale_x_continuous(          # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),  # Use grid-lines for quadrants only.
+    minor_breaks = NULL      # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(          # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(         # Use the Color Brewer to choose a palette.
+    type = "qual",           # Qualitative set.
+    palette = "Set1"       # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(       # Fine-tune the sizes of each point.
+    trans = "exp",           # Use an exp transformation to emphasise loud.
+    guide = "none"           # Remove the legend for size.
+  ) +
+  theme_light() +              # Use a simpler them.
+  labs(                        # Make the titles nice.
+    x = "Valence",
+    y = "Energy",
+    colour = "Mode"
+  )  
+
 ```
 
-```{r}
-HappyxSad_dist <- dist(HappyxSad_juice, method = 'euclidean')
-```
-
-```{r}
-hclust(HappyxSad_dist, method = 'single') %>% dendro_data %>% ggdendrogram
-```
-
-```{r}
-protoclust(HappyxSad_dist) %>% dendro_data %>% ggdendrogram
-```
-
-```{r}
-kmeans(HappyxSad_juice, 2)
-```
-
-```{r}
-grDevices::dev.size("px")
-heatmaply(
-    HappyxSad_juice,
-    hclustfun = hclust,
-    # hclustfun = protoclust,
-    # Comment out the hclust_method line when using protoclust.
-    hclust_method = 'average',
-    dist_method = 'euclidean')
-```
-
-*** 
-###Credits
 
 
-**Student**
-Made by Marielle Baelemans, 2019. For info: marielle.baelemans@student.uva.nl. 
 
-**University** 
-This portfolio is part of the Computational Musicology course, given by the Musicology department of the University of Amsterdam. 
+And so...
+======================
+
+Column {.tabset}
+-----------------------------
+
+###Conclusion
+>* Putting this all together, we can conclude that my own playlist --and so my own music taste-- is more sad compared to the big popplaylist.
+
+  + Moverover I learned some extra things about sad music. 
+      + It seems that Happy music has more change in tonal structure than sad music does.
+      + Sad music uses less different tones than happy music
+      + Timbre has also influence on mood and music. For now it seems that sad music has less timbre than happy music has. Timbre is quite a black box, but interesting for futher research.
+      
+### Discussion
+>It is always nice to have scientific evidence behind common sayings. Now that people say that I 'listen to such depressic music?!' I can say they are right, and annoy them with statistical evidence. I know more about what makes music sad, but I am far away from being done. 
+
+Timbre is a black box what needs to be revealed. Also, I did only a single song comparement between two songs, so that one can not  be generalized yet. It gives us a good start however, including more knowledge about these songs particular. The comparement graph between my own music and the popmusic is not that clear as I wanted to be. 
+    
+      
+  
+
+Column {.tabset}
+----------------------
+### Meme
+![Another meme](SadMusicMeme2.jpg)
+
+Appendix
+=======================
+
+>This portfolio is made by Mariëlle Baelemans, student (11853565) at the University of Amsterdam for the course Computational Musicology. For more info: marielle.baelemans@student.uva.nl
+
+Happy Tunes by Spotify: https://open.spotify.com/user/spotify/playlist/37i9dQZF1DX9u7XXOp0l5L?si=G6uOsSrIQdKpoHMDQO2Hgg
+
+Sad Songs by Spotify: https://open.spotify.com/user/spotify/playlist/37i9dQZF1DX7qK8ma5wgG1?si=NQJoYoGGToOJz1pV7XZCLw
+
+'Watvoor muzieksmaak heb je?'by Mariëlle Baelemans: https://open.spotify.com/user/11122548577/playlist/76MRLl4f6AvyYCrvs7X11P?si=mpGysdvXQruWI5-58WtN3w
+
+BIGGEST PLAYLIST WITH ALL THE BEST SONGS by Maxim Averbukh :https://open.spotify.com/user/thedoctorkto/playlist/54nv8jbrm4JoHEZ49Qvjgl?si=G3nOcOMcTjqex2M6lrYmcw
 
